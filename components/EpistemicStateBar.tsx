@@ -1,8 +1,8 @@
 'use client'
 
 import useSWR from 'swr'
-import type { Domain, PopulationStatus } from '@/lib/types'
-import { fetchPopulationStatus } from '@/lib/api'
+import type { Domain, PopulationStatus, ShiftsResponse } from '@/lib/types'
+import { fetchPopulationShifts, fetchPopulationStatus } from '@/lib/api'
 
 const POLL = 30_000
 
@@ -32,6 +32,11 @@ export default function EpistemicStateBar({ domain }: Props) {
   const { data, error } = useSWR<PopulationStatus>(
     ['population-status', domain],
     fetchPopulationStatus,
+    { refreshInterval: POLL, revalidateOnFocus: false },
+  )
+  const { data: shiftsData } = useSWR<ShiftsResponse>(
+    ['population-shifts', domain],
+    fetchPopulationShifts,
     { refreshInterval: POLL, revalidateOnFocus: false },
   )
 
@@ -64,6 +69,8 @@ export default function EpistemicStateBar({ domain }: Props) {
       </div>
     )
   }
+
+  const totalShifts = shiftsData?.total_shifts
 
   return (
     <div className="panel epistemic-state" style={{ padding: 0, gridColumn: '1/3' }}>
@@ -99,12 +106,12 @@ export default function EpistemicStateBar({ domain }: Props) {
 
       {/* paradigm_shifts */}
       <div className="state-metric has-tip">
-        <div className="tip">Number of times the dominant worldview has changed within this evidence window. Each shift is a Kuhnian paradigm change — the previously dominant belief structure lost enough ground that a different one took over.</div>
+        <div className="tip">Total recorded number of times the dominant worldview has changed. Each shift is a Kuhnian paradigm change — the previously dominant belief structure lost enough ground that a different one took over.</div>
         <div className="metric-label">paradigm_shifts</div>
-        <div className={`metric-value ${ShiftsColor(data.paradigm_shifts_this_window)}`}>
-          {data.paradigm_shifts_this_window}
+        <div className={`metric-value ${ShiftsColor(totalShifts ?? 0)}`}>
+          {totalShifts ?? '--'}
         </div>
-        <div className="metric-sub">this evidence window</div>
+        <div className="metric-sub">total recorded</div>
       </div>
 
       {/* frontier_edges */}
