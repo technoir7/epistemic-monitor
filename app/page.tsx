@@ -13,9 +13,11 @@ import ParadigmShiftTimeline from '@/components/ParadigmShiftTimeline'
 import ExplorationFrontier from '@/components/ExplorationFrontier'
 import PromptLine          from '@/components/PromptLine'
 import RegimeStatePanel    from '@/components/RegimeStatePanel'
+import AiRegimeStatePanel  from '@/components/AiRegimeStatePanel'
 
 const DOMAINS: { key: Domain; ticker: string; label: string }[] = [
   { key: 'mr', ticker: 'MR', label: 'macro_regime' },
+  { key: 'ai', ticker: 'AI', label: 'ai_regime' },
   { key: 'ng', ticker: 'NG', label: 'natural_gas' },
   { key: 'zc', ticker: 'ZC', label: 'corn' },
   { key: 'zs', ticker: 'ZS', label: 'soybeans' },
@@ -24,19 +26,70 @@ const DOMAINS: { key: Domain; ticker: string; label: string }[] = [
 const API_BASE =
   process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:8000'
 
-const SNAPSHOT_PROMPT = `You are interpreting the output of a probabilistic ontology engine — a Bayesian system that maintains competing causal world-models and updates them against empirical evidence. The system tracks macro-financial regime variables and learns which causal structures best explain the data.
+const SNAPSHOT_PROMPT = `You are interpreting the output of a probabilistic system that tracks 
+which economic story best fits recent financial data.
 
-Given the following JSON snapshot, write a concise analytical interpretation (3-5 paragraphs) covering:
-1. What the current macro regime appears to be, based on the active variables 
-   and dominant hypothesis
-2. How confident the engine is in this interpretation (structure entropy, 
-   score gap, generations dominant)
-3. What the competing hypotheses suggest about alternative explanations
-4. What the frontier edges reveal about unresolved causal questions
-5. Any notable recent paradigm shifts and what they imply
+Write a clear, plain-English interpretation (3-5 paragraphs) for a 
+senior business strategist. No jargon, no math, no system mechanics. 
+Explain what is actually happening in the economy right now, what the 
+data suggests is causing it, how certain we are, and what alternative 
+explanations still exist.
 
-Write as a macro analyst, not a software engineer. Do not describe the 
-mechanics of the system — interpret the epistemic content.
+Rules:
+- Never mention Bayesian, entropy, log score, ontology, or any 
+  technical term without immediately explaining it in plain English
+- When describing causal chains (A → B → C), explain each link in 
+  one plain sentence: what A is, why it leads to B, why B leads to C
+- Ground abstract variables in concrete real-world terms:
+  "YieldCurveInverted" = short-term borrowing costs more than long-term, 
+  historically signals recession fear
+  "LiquidityStress" = the Fed is shrinking its balance sheet, pulling 
+  money out of the financial system
+  "InflationShock" = inflation is running meaningfully above normal levels
+  "CreditSpreadStress" = corporate bonds are paying much higher rates 
+  than Treasuries, signaling default fear
+  "VolatilityShock" = markets are unusually fearful and uncertain
+  "DollarStrength" = the US dollar is strong relative to other currencies, 
+  tightening global financial conditions
+  "EquityRiskOn" = investors are willing to take on risk, buying stocks
+  "AIRiskOn" = tech and AI stocks are leading the market, growth 
+  narrative is dominant
+- Be direct about what this means for business conditions
+- Write like you are briefing someone who reads the Wall Street Journal 
+  but not academic papers — intelligent, experienced, no patience for 
+  abstraction
+
+Additional context to consider in your interpretation:
+
+The AI investment cycle has several structural dynamics that may not 
+be fully captured in the quantitative data. When interpreting this 
+snapshot, consider whether the current regime is consistent with any 
+of the following:
+
+- Open-source model capability closing the gap with frontier models: 
+  this would typically manifest as compressed risk premiums, falling 
+  market concentration, and divergence between semiconductor momentum 
+  and hyperscaler capex growth — infrastructure spending continues 
+  while the moat narrows.
+
+- Falling inference costs democratizing AI access: consistent with 
+  broad economic lift without proportional hyperscaler revenue growth, 
+  and with AI tooling spreading into sectors beyond tech.
+
+- Non-frontier application companies beginning to capture value: 
+  would show up as declining market concentration even as IP investment 
+  and labor productivity continue rising — the value is spreading out 
+  of the infrastructure layer.
+
+- Infrastructure monopolies historically do not capture all long-term 
+  value: the current capex acceleration may be building capacity that 
+  benefits the broader economy more than the infrastructure builders 
+  themselves. Consider whether the data is consistent with this 
+  historical pattern.
+
+These are structural interpretive lenses, not additional data points. 
+Use them to enrich your analysis where the quantitative signals are 
+ambiguous or incomplete.
 
 SNAPSHOT:`
 
@@ -93,8 +146,31 @@ function MrDomainPanels({ visible }: { visible: boolean }) {
       {/* Paradigm shift history — uses live dominant candidate_id from
           GET /v1/population/status?domain=mr; no mock needed */}
       <ParadigmShiftTimeline domain="mr" />
+      <ExplorationFrontier domain="mr" />
       {/* Row 6: terminal prompt line */}
       <PromptLine domain="mr" />
+    </div>
+  )
+}
+
+// AI Regime panel set.
+// Same layout as MrDomainPanels. No mock fallback — errors surface visibly.
+function AiDomainPanels({ visible }: { visible: boolean }) {
+  return (
+    <div style={{ display: visible ? 'contents' : 'none' }}>
+      {/* Row 1 (112px): engine status spanning cols 1-2 */}
+      <EpistemicStateBar domain="ai" />
+      {/* Col 1, rows 2-3: belief graph targeting SemiconductorMomentum */}
+      <BeliefGraph domain="ai" targetVariable="SemiconductorMomentum" />
+      {/* Col 2, rows 2-3: regime state (8 AI boolean variables + probabilities) */}
+      <AiRegimeStatePanel domain="ai" />
+      {/* Col 3, rows 1-4: ontology competition */}
+      <OntologyPopulation domain="ai" />
+      {/* Paradigm shift history */}
+      <ParadigmShiftTimeline domain="ai" />
+      <ExplorationFrontier domain="ai" />
+      {/* Row: terminal prompt line */}
+      <PromptLine domain="ai" />
     </div>
   )
 }
@@ -155,13 +231,13 @@ export default function Dashboard() {
     }
   }
 
-  async function handleExportSnapshot() {
+  async function handleExportSnapshot(domain: Domain) {
     if (exportState === 'exporting') return
 
     setExportState('exporting')
 
     try {
-      const res = await fetch(`${API_BASE}/v1/export/narrative-snapshot?domain=mr`, {
+      const res = await fetch(`${API_BASE}/v1/export/narrative-snapshot?domain=${domain}`, {
         headers: { Accept: 'application/json' },
       })
 
@@ -175,7 +251,7 @@ export default function Dashboard() {
       const link = document.createElement('a')
 
       link.href = url
-      link.download = `mr-snapshot-${timestamp}.txt`
+      link.download = `${domain}-snapshot-${timestamp}.txt`
       document.body.appendChild(link)
       link.click()
       link.remove()
@@ -206,15 +282,16 @@ export default function Dashboard() {
             <span className="blink">_</span>
           </h1>
           <div className="subtitle">
-            epistemic state monitor · research interface v0.1 · session active
+            <span className="subtitle-label">EPISTEMIC STATE MONITOR</span>
+            <span className="subtitle-separator">·</span>
+            <span className="status-ok">engine online</span>
+            <span className="subtitle-separator">·</span>
+            <span className="status-ok">evidence cycle active</span>
+            <span className="subtitle-separator">·</span>
+            <span className="status-warn">frontier unresolved</span>
           </div>
         </div>
         <div className="header-right">
-          <div className="status-line">
-            <span className="status-ok">engine online</span>
-            <span className="status-ok">evidence cycle active</span>
-            <span className="status-warn">frontier unresolved</span>
-          </div>
           <button
             className={`explain-btn${explainOpen ? ' active' : ''}`}
             onClick={() => setExplainOpen(v => !v)}
@@ -228,15 +305,13 @@ export default function Dashboard() {
           >
             {fetchLabel}
           </button>
-          {active === 'mr' && (
-            <button
-              className={`fetch-btn${exportState === 'failed' ? ' failed' : ''}`}
-              onClick={handleExportSnapshot}
-              disabled={exportState === 'exporting'}
-            >
-              {exportLabel}
-            </button>
-          )}
+          <button
+            className={`fetch-btn${exportState === 'failed' ? ' failed' : ''}`}
+            onClick={() => handleExportSnapshot(active)}
+            disabled={exportState === 'exporting'}
+          >
+            {exportLabel}
+          </button>
           <Clock />
         </div>
       </header>
@@ -324,7 +399,8 @@ export default function Dashboard() {
           MR uses its own panel set; commodity domains share DomainPanels.
         */}
         <MrDomainPanels visible={active === 'mr'} />
-        {DOMAINS.filter(d => d.key !== 'mr').map(d => (
+        <AiDomainPanels visible={active === 'ai'} />
+        {DOMAINS.filter(d => d.key !== 'mr' && d.key !== 'ai').map(d => (
           <DomainPanels key={d.key} domain={d.key} visible={active === d.key} />
         ))}
       </div>

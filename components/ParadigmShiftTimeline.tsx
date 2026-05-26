@@ -34,22 +34,24 @@ export default function ParadigmShiftTimeline({ domain }: Props) {
       ) : events.length === 0 ? (
         <div style={{ color: 'var(--text-faint)', fontSize: 10 }}>no shifts recorded</div>
       ) : (
-        <div className="timeline">
-          <div className="timeline-track" />
-          {events.map((e, i) => (
-            <div key={e.shift_id || i} className="shift-event">
-              <div className="shift-dot is-shift" />
-              <div className="shift-label sl-shift">
-                gen {e.generation}
-                {'\n'}
-                {e.previous_dominant_name} → {e.new_dominant_name}
-                {'\n'}
-                {e.timestamp}
-                {'\n'}
-                evidence {e.evidence_count_at_shift}
+        <div className="timeline-scroll">
+          <div className="timeline">
+            <div className="timeline-track" />
+            {events.map((e, i) => (
+              <div key={e.shift_id || i} className="shift-event">
+                <div className="shift-dot is-shift" />
+                <div className="shift-label sl-shift">
+                  gen {e.generation}
+                  {'\n'}
+                  {e.previous_dominant_name} → {e.new_dominant_name}
+                  {'\n'}
+                  {e.timestamp}
+                  {'\n'}
+                  evidence {e.evidence_count_at_shift}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       )}
     </div>

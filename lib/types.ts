@@ -1,5 +1,5 @@
 // ─── Shared ──────────────────────────────────────────────────────────────────
-export type Domain = 'ng' | 'zc' | 'zs' | 'mr'
+export type Domain = 'ng' | 'zc' | 'zs' | 'mr' | 'ai'
 
 // ─── GET /v1/population/status → EpistemicStateBar ───────────────────────────
 export interface PopulationStatus {
@@ -152,6 +152,17 @@ export interface MrEvidenceResponse {
   domain: string
   records: MrEvidenceRecord[]
 }
+
+// ─── GET /v1/evidence/recent?domain=ai → AiRegimeStatePanel ──────────────────
+export type AiVariableName =
+  | 'SemiconductorMomentum'
+  | 'MarketConcentrationExtreme'
+  | 'HyperscalerCapexAccelerating'
+  | 'TechValuationDetached'
+  | 'IPInvestmentRising'
+  | 'LaborProductivityImproving'
+  | 'BroadEconomicLift'
+  | 'AIRiskPremiumCompressed'
 
 // ─── GET /v1/debug/entropy → console diagnostics ────────────────────────────
 export interface VariableEntropyDebug {

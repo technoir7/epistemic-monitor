@@ -7,6 +7,14 @@ import { MOCK } from '@/lib/mockData'
 
 const POLL = 30_000
 
+const TARGET_VARIABLE_BY_DOMAIN: Record<Domain, string> = {
+  mr: 'YieldCurveInverted',
+  ai: 'SemiconductorMomentum',
+  ng: 'PriceUp',
+  zc: 'CornPriceUp',
+  zs: 'SoyPriceUp',
+}
+
 interface Props {
   domain: Domain
 }
@@ -28,7 +36,7 @@ export default function ExplorationFrontier({ domain }: Props) {
   const req: QueryRequest | null = dominantId
     ? {
         domain,
-        target_variable: 'price_up',
+        target_variable: TARGET_VARIABLE_BY_DOMAIN[domain],
         candidate_id: dominantId,
         aggregation: 'weighted_avg',
       }
