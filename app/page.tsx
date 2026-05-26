@@ -21,6 +21,25 @@ const DOMAINS: { key: Domain; ticker: string; label: string }[] = [
   { key: 'zs', ticker: 'ZS', label: 'soybeans' },
 ]
 
+const API_BASE =
+  process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:8000'
+
+const SNAPSHOT_PROMPT = `You are interpreting the output of a probabilistic ontology engine — a Bayesian system that maintains competing causal world-models and updates them against empirical evidence. The system tracks macro-financial regime variables and learns which causal structures best explain the data.
+
+Given the following JSON snapshot, write a concise analytical interpretation (3-5 paragraphs) covering:
+1. What the current macro regime appears to be, based on the active variables 
+   and dominant hypothesis
+2. How confident the engine is in this interpretation (structure entropy, 
+   score gap, generations dominant)
+3. What the competing hypotheses suggest about alternative explanations
+4. What the frontier edges reveal about unresolved causal questions
+5. Any notable recent paradigm shifts and what they imply
+
+Write as a macro analyst, not a software engineer. Do not describe the 
+mechanics of the system — interpret the epistemic content.
+
+SNAPSHOT:`
+
 declare global {
   interface Window {
     fetchEntropyDebug?: (domain?: Domain) => Promise<unknown>
@@ -81,6 +100,7 @@ function MrDomainPanels({ visible }: { visible: boolean }) {
 }
 
 type FetchState = 'idle' | 'fetching' | 'failed'
+type ExportState = 'idle' | 'exporting' | 'failed'
 
 function isActiveDomainPanelKey(key: unknown, domain: Domain): boolean {
   if (!Array.isArray(key)) return false
@@ -96,6 +116,7 @@ export default function Dashboard() {
   const [active, setActive] = useState<Domain>('mr')
   const [explainOpen, setExplainOpen] = useState(false)
   const [fetchState, setFetchState] = useState<FetchState>('idle')
+  const [exportState, setExportState] = useState<ExportState>('idle')
   const resetFetchStateRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
@@ -134,10 +155,46 @@ export default function Dashboard() {
     }
   }
 
+  async function handleExportSnapshot() {
+    if (exportState === 'exporting') return
+
+    setExportState('exporting')
+
+    try {
+      const res = await fetch(`${API_BASE}/v1/export/narrative-snapshot?domain=mr`, {
+        headers: { Accept: 'application/json' },
+      })
+
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+
+      const snapshot = await res.json()
+      const timestamp = new Date().toISOString()
+      const contents = `${SNAPSHOT_PROMPT}\n${JSON.stringify(snapshot, null, 2)}\n`
+      const blob = new Blob([contents], { type: 'text/plain;charset=utf-8' })
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+
+      link.href = url
+      link.download = `mr-snapshot-${timestamp}.txt`
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+      URL.revokeObjectURL(url)
+      setExportState('idle')
+    } catch {
+      setExportState('failed')
+    }
+  }
+
   const fetchLabel =
     fetchState === 'fetching' ? '[ fetching... ]' :
     fetchState === 'failed' ? '[ fetch failed ]' :
     '[ fetch now ]'
+
+  const exportLabel =
+    exportState === 'exporting' ? '[ exporting... ]' :
+    exportState === 'failed' ? '[ export failed ]' :
+    '[ EXPORT SNAPSHOT ]'
 
   return (
     <div className="shell">
@@ -171,6 +228,15 @@ export default function Dashboard() {
           >
             {fetchLabel}
           </button>
+          {active === 'mr' && (
+            <button
+              className={`fetch-btn${exportState === 'failed' ? ' failed' : ''}`}
+              onClick={handleExportSnapshot}
+              disabled={exportState === 'exporting'}
+            >
+              {exportLabel}
+            </button>
+          )}
           <Clock />
         </div>
       </header>
