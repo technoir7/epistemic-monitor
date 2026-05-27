@@ -13,8 +13,8 @@ import type {
 import { MOCK } from './mockData'
 
 // ─── Mock-lookup helper ───────────────────────────────────────────────────────
-// Returns the mock entry for ng/zc/zs; undefined for any domain without a mock
-// (e.g. 'mr').  All fetchers branch on this: if no mock, use getRequired so
+// Returns the mock entry for ng; undefined for any domain without a mock.
+// All fetchers branch on this: if no mock, use getRequired so
 // that API failures surface as visible errors rather than silently falling back.
 type MockKey = keyof typeof MOCK
 function mockFor(domain: Domain) {

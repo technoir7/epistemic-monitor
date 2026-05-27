@@ -14,13 +14,19 @@ import ExplorationFrontier from '@/components/ExplorationFrontier'
 import PromptLine          from '@/components/PromptLine'
 import RegimeStatePanel    from '@/components/RegimeStatePanel'
 import AiRegimeStatePanel  from '@/components/AiRegimeStatePanel'
+import SdRegimeStatePanel  from '@/components/SdRegimeStatePanel'
+import CcRegimeStatePanel  from '@/components/CcRegimeStatePanel'
+import ErRegimeStatePanel  from '@/components/ErRegimeStatePanel'
+import LmRegimeStatePanel  from '@/components/LmRegimeStatePanel'
 
 const DOMAINS: { key: Domain; ticker: string; label: string }[] = [
   { key: 'mr', ticker: 'MR', label: 'macro_regime' },
   { key: 'ai', ticker: 'AI', label: 'ai_regime' },
   { key: 'ng', ticker: 'NG', label: 'natural_gas' },
-  { key: 'zc', ticker: 'ZC', label: 'corn' },
-  { key: 'zs', ticker: 'ZS', label: 'soybeans' },
+  { key: 'sd', ticker: 'SD', label: 'sovereign_debt' },
+  { key: 'cc', ticker: 'CC', label: 'credit_cycle' },
+  { key: 'er', ticker: 'ER', label: 'energy_regime' },
+  { key: 'lm', ticker: 'LM', label: 'labor_market' },
 ]
 
 const API_BASE =
@@ -41,25 +47,15 @@ Rules:
 - When describing causal chains (A → B → C), explain each link in 
   one plain sentence: what A is, why it leads to B, why B leads to C
 - Ground abstract variables in concrete real-world terms:
-  "YieldCurveInverted" = short-term borrowing costs more than long-term, 
-  historically signals recession fear
-  "LiquidityStress" = the Fed is shrinking its balance sheet, pulling 
-  money out of the financial system
-  "InflationShock" = inflation is running meaningfully above normal levels
-  "CreditSpreadStress" = corporate bonds are paying much higher rates 
-  than Treasuries, signaling default fear
-  "VolatilityShock" = markets are unusually fearful and uncertain
-  "DollarStrength" = the US dollar is strong relative to other currencies, 
-  tightening global financial conditions
-  "EquityRiskOn" = investors are willing to take on risk, buying stocks
-  "AIRiskOn" = tech and AI stocks are leading the market, growth 
-  narrative is dominant
+{{VARIABLE_DEFINITIONS}}
 - Be direct about what this means for business conditions
 - Write like you are briefing someone who reads the Wall Street Journal 
   but not academic papers — intelligent, experienced, no patience for 
   abstraction
 
-Additional context to consider in your interpretation:
+SNAPSHOT:`
+
+const AI_SNAPSHOT_CONTEXT = `Additional context to consider in your interpretation:
 
 The AI investment cycle has several structural dynamics that may not 
 be fully captured in the quantitative data. When interpreting this 
@@ -89,9 +85,76 @@ of the following:
 
 These are structural interpretive lenses, not additional data points. 
 Use them to enrich your analysis where the quantitative signals are 
-ambiguous or incomplete.
+ambiguous or incomplete.`
 
-SNAPSHOT:`
+const VARIABLE_DEFINITIONS_BY_DOMAIN: Record<Domain, string> = {
+  mr: `  "YieldCurveInverted" = short-term borrowing costs more than long-term, historically signals recession fear
+  "LiquidityStress" = the Fed is shrinking its balance sheet, pulling money out of the financial system
+  "InflationShock" = inflation is running meaningfully above normal levels
+  "CreditSpreadStress" = corporate bonds are paying much higher rates than Treasuries, signaling default fear
+  "VolatilityShock" = markets are unusually fearful and uncertain
+  "DollarStrength" = the US dollar is strong relative to other currencies, tightening global financial conditions
+  "EquityRiskOn" = investors are willing to take on risk, buying stocks
+  "AIRiskOn" = tech and AI stocks are leading the market, growth narrative is dominant`,
+  ai: `  "SemiconductorMomentum" = chip stocks are rising, demand for AI hardware is strong
+  "MarketConcentrationExtreme" = a small number of tech companies are capturing most of the market gains
+  "HyperscalerCapexAccelerating" = Microsoft, Google, Amazon, and Meta are rapidly increasing data center spending
+  "TechValuationDetached" = tech stock prices are well above their historical norms
+  "IPInvestmentRising" = businesses are increasing spending on software, patents, and intellectual property
+  "LaborProductivityImproving" = workers are producing more output per hour, economy-wide
+  "BroadEconomicLift" = the overall economy is growing at a healthy pace
+  "AIRiskPremiumCompressed" = markets are calm about AI-related risks, fear is low`,
+  ng: `  "TempAnom" = temperatures are running above or below seasonal norms
+  "HeatingDem" = demand for natural gas for home and commercial heating is elevated
+  "StorageDraw" = natural gas is being pulled out of storage facilities faster than normal
+  "PriceUp" = natural gas spot prices are rising`,
+  sd: `  "USYieldSpiking" = US 10-year Treasury yields are rising sharply above historical norms
+  "SpreadWidening" = the gap between risky and safe borrowing costs is growing
+  "DollarStrengthening" = the US dollar is strengthening against other currencies
+  "FedBalanceSheetShrinking" = the Federal Reserve is reducing its asset holdings
+  "EMStressElevated" = emerging market currencies and assets are under pressure
+  "FiscalDominanceRisk" = US government debt trajectory is becoming a market concern
+  "CreditDefaultRisk" = markets are pricing in higher probability of debt defaults
+  "GlobalLiquidityContracting" = global money supply and credit availability is shrinking`,
+  cc: `  "HYSpreadElevated" = high-yield corporate bonds are paying much more than Treasuries, signaling credit stress
+  "LeveragedLoanStress" = highly indebted companies are struggling to service their loans
+  "CorporateDefaultRisk" = companies are at elevated risk of failing to repay debt
+  "CreditImpulseNegative" = the flow of new credit into the economy is slowing or contracting
+  "BankLendingTightening" = banks are making it harder to borrow money
+  "InvestmentGradeSpread" = even high-quality corporate bonds are paying more than normal
+  "HighYieldIssuanceFalling" = companies are issuing fewer junk bonds, a sign of stress
+  "RefinancingStress" = companies facing debt maturities are struggling to refinance at affordable rates`,
+  er: `  "OilPriceSurge" = crude oil prices are rising significantly above recent norms
+  "NatGasPriceSurge" = natural gas prices are rising significantly
+  "EnergyEquityMomentum" = energy sector stocks are outperforming the broader market
+  "OPECSupplyConstraint" = OPEC is restricting oil production, tightening supply
+  "RenewablesDisplacement" = clean energy is gaining market share relative to fossil fuels
+  "EnergyInflationPersistent" = energy costs remain elevated in consumer price data
+  "GeopoliticalRiskElevated" = geopolitical tensions are creating uncertainty in energy markets
+  "DemandDestructionRisk" = high energy prices or economic weakness is reducing energy demand`,
+  lm: `  "UnemploymentRising" = the unemployment rate is trending higher
+  "WageInflationPersistent" = wages are growing faster than normal, adding cost pressure
+  "JobOpeningsFalling" = employers are posting fewer job openings, demand for workers is cooling
+  "LayoffCycleBeginning" = initial jobless claims are rising, layoffs are increasing
+  "LaborProductivityWeak" = workers are producing less output per hour than historical norms
+  "ParticipationRateFalling" = fewer working-age people are actively in the labor force
+  "RealWageGrowthPositive" = wages are growing faster than inflation, consumers have more purchasing power
+  "TightLaborMarket" = jobs are plentiful relative to workers, employers are competing for talent`,
+}
+
+function snapshotPromptForDomain(domain: Domain) {
+  const prompt = SNAPSHOT_PROMPT.replace(
+    '{{VARIABLE_DEFINITIONS}}',
+    VARIABLE_DEFINITIONS_BY_DOMAIN[domain],
+  )
+
+  if (domain !== 'ai') return prompt
+
+  return prompt.replace(
+    '\nSNAPSHOT:',
+    `\n\n${AI_SNAPSHOT_CONTEXT}\n\nSNAPSHOT:`,
+  )
+}
 
 declare global {
   interface Window {
@@ -175,6 +238,66 @@ function AiDomainPanels({ visible }: { visible: boolean }) {
   )
 }
 
+// Sovereign Debt panel set. No mock fallback — errors surface visibly.
+function SdDomainPanels({ visible }: { visible: boolean }) {
+  return (
+    <div style={{ display: visible ? 'contents' : 'none' }}>
+      <EpistemicStateBar domain="sd" />
+      <BeliefGraph domain="sd" targetVariable="USYieldSpiking" />
+      <SdRegimeStatePanel domain="sd" />
+      <OntologyPopulation domain="sd" />
+      <ParadigmShiftTimeline domain="sd" />
+      <ExplorationFrontier domain="sd" />
+      <PromptLine domain="sd" />
+    </div>
+  )
+}
+
+// Credit Cycle panel set. No mock fallback — errors surface visibly.
+function CcDomainPanels({ visible }: { visible: boolean }) {
+  return (
+    <div style={{ display: visible ? 'contents' : 'none' }}>
+      <EpistemicStateBar domain="cc" />
+      <BeliefGraph domain="cc" targetVariable="HYSpreadElevated" />
+      <CcRegimeStatePanel domain="cc" />
+      <OntologyPopulation domain="cc" />
+      <ParadigmShiftTimeline domain="cc" />
+      <ExplorationFrontier domain="cc" />
+      <PromptLine domain="cc" />
+    </div>
+  )
+}
+
+// Energy Regime panel set. No mock fallback — errors surface visibly.
+function ErDomainPanels({ visible }: { visible: boolean }) {
+  return (
+    <div style={{ display: visible ? 'contents' : 'none' }}>
+      <EpistemicStateBar domain="er" />
+      <BeliefGraph domain="er" targetVariable="OilPriceSurge" />
+      <ErRegimeStatePanel domain="er" />
+      <OntologyPopulation domain="er" />
+      <ParadigmShiftTimeline domain="er" />
+      <ExplorationFrontier domain="er" />
+      <PromptLine domain="er" />
+    </div>
+  )
+}
+
+// Labor Market panel set. No mock fallback — errors surface visibly.
+function LmDomainPanels({ visible }: { visible: boolean }) {
+  return (
+    <div style={{ display: visible ? 'contents' : 'none' }}>
+      <EpistemicStateBar domain="lm" />
+      <BeliefGraph domain="lm" targetVariable="UnemploymentRising" />
+      <LmRegimeStatePanel domain="lm" />
+      <OntologyPopulation domain="lm" />
+      <ParadigmShiftTimeline domain="lm" />
+      <ExplorationFrontier domain="lm" />
+      <PromptLine domain="lm" />
+    </div>
+  )
+}
+
 type FetchState = 'idle' | 'fetching' | 'failed'
 type ExportState = 'idle' | 'exporting' | 'failed'
 
@@ -245,7 +368,7 @@ export default function Dashboard() {
 
       const snapshot = await res.json()
       const timestamp = new Date().toISOString()
-      const contents = `${SNAPSHOT_PROMPT}\n${JSON.stringify(snapshot, null, 2)}\n`
+      const contents = `${snapshotPromptForDomain(domain)}\n${JSON.stringify(snapshot, null, 2)}\n`
       const blob = new Blob([contents], { type: 'text/plain;charset=utf-8' })
       const url = URL.createObjectURL(blob)
       const link = document.createElement('a')
@@ -400,9 +523,13 @@ export default function Dashboard() {
         */}
         <MrDomainPanels visible={active === 'mr'} />
         <AiDomainPanels visible={active === 'ai'} />
-        {DOMAINS.filter(d => d.key !== 'mr' && d.key !== 'ai').map(d => (
-          <DomainPanels key={d.key} domain={d.key} visible={active === d.key} />
-        ))}
+        {/* NG uses the generic commodity DomainPanels with full mock support */}
+        <DomainPanels domain="ng" visible={active === 'ng'} />
+        {/* New macro domains — no mock fallback, API errors surface visibly */}
+        <SdDomainPanels visible={active === 'sd'} />
+        <CcDomainPanels visible={active === 'cc'} />
+        <ErDomainPanels visible={active === 'er'} />
+        <LmDomainPanels visible={active === 'lm'} />
       </div>
     </div>
   )

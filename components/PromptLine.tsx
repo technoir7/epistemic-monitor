@@ -10,8 +10,10 @@ const QUERY: Record<Domain, string> = {
   mr: 'query --domain mr --target AIRiskOn --condition YieldCurveInverted=true --aggregation weighted_avg',
   ai: 'query --domain ai --target SemiconductorMomentum --condition HyperscalerCapexAccelerating=true --aggregation weighted_avg',
   ng: 'query --domain ng --target price_up --condition temp_anom=true --aggregation weighted_avg',
-  zc: 'query --domain zc --target price_up --condition precip_anom=true --aggregation weighted_avg',
-  zs: 'query --domain zs --target SoyPriceUp --condition PlantingDelayed=true --aggregation weighted_avg',
+  sd: 'query --domain sd --target USYieldSpiking --condition SpreadWidening=true --aggregation weighted_avg',
+  cc: 'query --domain cc --target HYSpreadElevated --condition BankLendingTightening=true --aggregation weighted_avg',
+  er: 'query --domain er --target OilPriceSurge --condition OPECSupplyConstraint=true --aggregation weighted_avg',
+  lm: 'query --domain lm --target UnemploymentRising --condition LayoffCycleBeginning=true --aggregation weighted_avg',
 }
 
 export default function PromptLine({ domain }: Props) {

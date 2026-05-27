@@ -11,8 +11,10 @@ const TARGET_VARIABLE_BY_DOMAIN: Record<Domain, string> = {
   mr: 'YieldCurveInverted',
   ai: 'SemiconductorMomentum',
   ng: 'PriceUp',
-  zc: 'CornPriceUp',
-  zs: 'SoyPriceUp',
+  sd: 'USYieldSpiking',
+  cc: 'HYSpreadElevated',
+  er: 'OilPriceSurge',
+  lm: 'UnemploymentRising',
 }
 
 interface Props {

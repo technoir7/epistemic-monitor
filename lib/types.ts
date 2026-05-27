@@ -1,5 +1,5 @@
 // ─── Shared ──────────────────────────────────────────────────────────────────
-export type Domain = 'ng' | 'zc' | 'zs' | 'mr' | 'ai'
+export type Domain = 'mr' | 'ai' | 'ng' | 'sd' | 'cc' | 'er' | 'lm'
 
 // ─── GET /v1/population/status → EpistemicStateBar ───────────────────────────
 export interface PopulationStatus {
@@ -163,6 +163,50 @@ export type AiVariableName =
   | 'LaborProductivityImproving'
   | 'BroadEconomicLift'
   | 'AIRiskPremiumCompressed'
+
+// ─── POST /v1/inference/query → SdRegimeStatePanel ───────────────────────────
+export type SdVariableName =
+  | 'USYieldSpiking'
+  | 'SpreadWidening'
+  | 'DollarStrengthening'
+  | 'FedBalanceSheetShrinking'
+  | 'EMStressElevated'
+  | 'FiscalDominanceRisk'
+  | 'CreditDefaultRisk'
+  | 'GlobalLiquidityContracting'
+
+// ─── POST /v1/inference/query → CcRegimeStatePanel ───────────────────────────
+export type CcVariableName =
+  | 'HYSpreadElevated'
+  | 'LeveragedLoanStress'
+  | 'CorporateDefaultRisk'
+  | 'CreditImpulseNegative'
+  | 'BankLendingTightening'
+  | 'InvestmentGradeSpread'
+  | 'HighYieldIssuanceFalling'
+  | 'RefinancingStress'
+
+// ─── POST /v1/inference/query → ErRegimeStatePanel ───────────────────────────
+export type ErVariableName =
+  | 'OilPriceSurge'
+  | 'NatGasPriceSurge'
+  | 'EnergyEquityMomentum'
+  | 'OPECSupplyConstraint'
+  | 'RenewablesDisplacement'
+  | 'EnergyInflationPersistent'
+  | 'GeopoliticalRiskElevated'
+  | 'DemandDestructionRisk'
+
+// ─── POST /v1/inference/query → LmRegimeStatePanel ───────────────────────────
+export type LmVariableName =
+  | 'UnemploymentRising'
+  | 'WageInflationPersistent'
+  | 'JobOpeningsFalling'
+  | 'LayoffCycleBeginning'
+  | 'LaborProductivityWeak'
+  | 'ParticipationRateFalling'
+  | 'RealWageGrowthPositive'
+  | 'TightLaborMarket'
 
 // ─── GET /v1/debug/entropy → console diagnostics ────────────────────────────
 export interface VariableEntropyDebug {
