@@ -18,6 +18,9 @@ import SdRegimeStatePanel  from '@/components/SdRegimeStatePanel'
 import CcRegimeStatePanel  from '@/components/CcRegimeStatePanel'
 import ErRegimeStatePanel  from '@/components/ErRegimeStatePanel'
 import LmRegimeStatePanel  from '@/components/LmRegimeStatePanel'
+import CrRegimeStatePanel  from '@/components/CrRegimeStatePanel'
+import GpRegimeStatePanel  from '@/components/GpRegimeStatePanel'
+import SfRegimeStatePanel  from '@/components/SfRegimeStatePanel'
 
 const DOMAINS: { key: Domain; ticker: string; label: string }[] = [
   { key: 'mr', ticker: 'MR', label: 'macro_regime' },
@@ -27,6 +30,9 @@ const DOMAINS: { key: Domain; ticker: string; label: string }[] = [
   { key: 'cc', ticker: 'CC', label: 'credit_cycle' },
   { key: 'er', ticker: 'ER', label: 'energy_regime' },
   { key: 'lm', ticker: 'LM', label: 'labor_market' },
+  { key: 'cr', ticker: 'CR', label: 'crypto_regime' },
+  { key: 'gp', ticker: 'GP', label: 'geopolitics' },
+  { key: 'sf', ticker: 'SF', label: 'sf_urban' },
 ]
 
 const API_BASE =
@@ -140,6 +146,30 @@ const VARIABLE_DEFINITIONS_BY_DOMAIN: Record<Domain, string> = {
   "ParticipationRateFalling" = fewer working-age people are actively in the labor force
   "RealWageGrowthPositive" = wages are growing faster than inflation, consumers have more purchasing power
   "TightLaborMarket" = jobs are plentiful relative to workers, employers are competing for talent`,
+  cr: `  "BTCMomentumPositive" = Bitcoin prices are trending upward over the past quarter
+  "AltcoinSeasonActive" = smaller cryptocurrencies are outperforming Bitcoin, risk appetite is high
+  "OnChainActivityElevated" = actual usage of blockchain networks is elevated, suggesting genuine demand
+  "StablecoinFlowPositive" = money is flowing into dollar-pegged stablecoins, suggesting preparation to deploy capital
+  "CryptoVolatilityShock" = cryptocurrency prices are swinging wildly, fear and uncertainty are elevated
+  "RiskAssetCorrelation" = crypto is moving in lockstep with stocks, behaving as a risk asset rather than a hedge
+  "NarrativeMomentum" = Ethereum and utility-focused tokens are outperforming Bitcoin, the technology utility narrative is dominant
+  "DollarDebasementNarrative" = gold and Bitcoin are both rising together, dollar store-of-value concerns are driving buying`,
+  gp: `  "ConflictIntensityElevated" = the volume and severity of armed conflicts globally is above historical norms
+  "TradeDisruptionRisk" = supply chains and trade routes are under stress from geopolitical events
+  "SanctionsPressureElevated" = economic sanctions activity is elevated, restricting cross-border trade and finance
+  "DiplomaticTensionHigh" = relations between major powers are deteriorating, raising the risk of escalation
+  "SupplyChainStress" = the production and delivery of goods is being disrupted by geopolitical factors, pushing prices higher
+  "CurrencyWarSignal" = major economies are engaging in competitive currency devaluation or market intervention
+  "EnergyWeaponizationRisk" = energy supply is being used as a geopolitical weapon, threatening price spikes and shortages
+  "GlobalTradeVolumeWeak" = the overall volume of goods crossing borders is declining, signaling deglobalization pressure`,
+  sf: `  "TechHiringAccelerating" = San Francisco's technology sector is adding workers at an above-normal pace
+  "OfficeVacancyFalling" = office vacancy rates are declining as companies lease more space, a sign of recovery
+  "RetailClosureElevated" = retail stores and restaurants are closing at an above-normal rate
+  "PermitActivityRising" = new construction permit applications are above historical norms, a leading indicator of business confidence
+  "CrimeIndexElevated" = reported crime incidents are above the historical average, a headwind to foot traffic and business investment
+  "StartupFormationRising" = new business registrations are accelerating, signaling economic optimism and entrepreneur confidence
+  "FootTrafficRecovering" = hospitality and retail employment is recovering toward pre-downturn levels, people are returning to the city
+  "PopulationFlowPositive" = San Francisco's overall employment base is growing, suggesting net population inflow and retention`,
 }
 
 function snapshotPromptForDomain(domain: Domain) {
@@ -294,6 +324,51 @@ function LmDomainPanels({ visible }: { visible: boolean }) {
       <ParadigmShiftTimeline domain="lm" />
       <ExplorationFrontier domain="lm" />
       <PromptLine domain="lm" />
+    </div>
+  )
+}
+
+// Crypto Regime panel set. No mock fallback — errors surface visibly.
+function CrDomainPanels({ visible }: { visible: boolean }) {
+  return (
+    <div style={{ display: visible ? 'contents' : 'none' }}>
+      <EpistemicStateBar domain="cr" />
+      <BeliefGraph domain="cr" targetVariable="BTCMomentumPositive" />
+      <CrRegimeStatePanel domain="cr" />
+      <OntologyPopulation domain="cr" />
+      <ParadigmShiftTimeline domain="cr" />
+      <ExplorationFrontier domain="cr" />
+      <PromptLine domain="cr" />
+    </div>
+  )
+}
+
+// Geopolitics panel set. No mock fallback — errors surface visibly.
+function GpDomainPanels({ visible }: { visible: boolean }) {
+  return (
+    <div style={{ display: visible ? 'contents' : 'none' }}>
+      <EpistemicStateBar domain="gp" />
+      <BeliefGraph domain="gp" targetVariable="ConflictIntensityElevated" />
+      <GpRegimeStatePanel domain="gp" />
+      <OntologyPopulation domain="gp" />
+      <ParadigmShiftTimeline domain="gp" />
+      <ExplorationFrontier domain="gp" />
+      <PromptLine domain="gp" />
+    </div>
+  )
+}
+
+// SF Urban panel set. No mock fallback — errors surface visibly.
+function SfDomainPanels({ visible }: { visible: boolean }) {
+  return (
+    <div style={{ display: visible ? 'contents' : 'none' }}>
+      <EpistemicStateBar domain="sf" />
+      <BeliefGraph domain="sf" targetVariable="TechHiringAccelerating" />
+      <SfRegimeStatePanel domain="sf" />
+      <OntologyPopulation domain="sf" />
+      <ParadigmShiftTimeline domain="sf" />
+      <ExplorationFrontier domain="sf" />
+      <PromptLine domain="sf" />
     </div>
   )
 }
@@ -530,6 +605,9 @@ export default function Dashboard() {
         <CcDomainPanels visible={active === 'cc'} />
         <ErDomainPanels visible={active === 'er'} />
         <LmDomainPanels visible={active === 'lm'} />
+        <CrDomainPanels visible={active === 'cr'} />
+        <GpDomainPanels visible={active === 'gp'} />
+        <SfDomainPanels visible={active === 'sf'} />
       </div>
     </div>
   )

@@ -1,5 +1,5 @@
 // ─── Shared ──────────────────────────────────────────────────────────────────
-export type Domain = 'mr' | 'ai' | 'ng' | 'sd' | 'cc' | 'er' | 'lm'
+export type Domain = 'mr' | 'ai' | 'ng' | 'sd' | 'cc' | 'er' | 'lm' | 'cr' | 'gp' | 'sf'
 
 // ─── GET /v1/population/status → EpistemicStateBar ───────────────────────────
 export interface PopulationStatus {
@@ -196,6 +196,39 @@ export type ErVariableName =
   | 'EnergyInflationPersistent'
   | 'GeopoliticalRiskElevated'
   | 'DemandDestructionRisk'
+
+// ─── POST /v1/inference/query → CrRegimeStatePanel ───────────────────────────
+export type CrVariableName =
+  | 'BTCMomentumPositive'
+  | 'AltcoinSeasonActive'
+  | 'OnChainActivityElevated'
+  | 'StablecoinFlowPositive'
+  | 'CryptoVolatilityShock'
+  | 'RiskAssetCorrelation'
+  | 'NarrativeMomentum'
+  | 'DollarDebasementNarrative'
+
+// ─── POST /v1/inference/query → GpRegimeStatePanel ───────────────────────────
+export type GpVariableName =
+  | 'ConflictIntensityElevated'
+  | 'TradeDisruptionRisk'
+  | 'SanctionsPressureElevated'
+  | 'DiplomaticTensionHigh'
+  | 'SupplyChainStress'
+  | 'CurrencyWarSignal'
+  | 'EnergyWeaponizationRisk'
+  | 'GlobalTradeVolumeWeak'
+
+// ─── POST /v1/inference/query → SfRegimeStatePanel ───────────────────────────
+export type SfVariableName =
+  | 'TechHiringAccelerating'
+  | 'OfficeVacancyFalling'
+  | 'RetailClosureElevated'
+  | 'PermitActivityRising'
+  | 'CrimeIndexElevated'
+  | 'StartupFormationRising'
+  | 'FootTrafficRecovering'
+  | 'PopulationFlowPositive'
 
 // ─── POST /v1/inference/query → LmRegimeStatePanel ───────────────────────────
 export type LmVariableName =
