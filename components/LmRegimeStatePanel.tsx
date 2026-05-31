@@ -1,7 +1,7 @@
 'use client'
 
 import useSWR from 'swr'
-import type { Domain, LmVariableName } from '@/lib/types'
+import type { Domain, OntologyMode, LmVariableName } from '@/lib/types'
 
 const POLL = 30_000
 const API_BASE =
@@ -37,14 +37,14 @@ interface VariableProbabilityResponse {
 }
 
 async function fetchLmVariableProbabilities(
-  [, domain]: [string, Domain],
+  [, domain, mode]: [string, Domain, OntologyMode],
 ): Promise<LmRegimeProbabilityMap> {
   const entries = await Promise.all(
     VAR_ORDER.map(async name => {
       const res = await fetch(`${API_BASE}/v1/inference/query`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify({ domain, target_variable: name }),
+        body: JSON.stringify({ domain, target_variable: name, ontology_mode: mode }),
       })
 
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
@@ -63,11 +63,12 @@ async function fetchLmVariableProbabilities(
 
 interface Props {
   domain: Domain
+  ontologyMode: OntologyMode
 }
 
-export default function LmRegimeStatePanel({ domain }: Props) {
+export default function LmRegimeStatePanel({ domain, ontologyMode }: Props) {
   const { data, error } = useSWR<LmRegimeProbabilityMap>(
-    ['lm-regime-probabilities', domain],
+    ['lm-regime-probabilities', domain, ontologyMode],
     fetchLmVariableProbabilities,
     { refreshInterval: POLL, revalidateOnFocus: false },
   )

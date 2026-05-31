@@ -1,7 +1,7 @@
 'use client'
 
 import useSWR from 'swr'
-import type { Domain, InferenceResponse, QueryRequest } from '@/lib/types'
+import type { Domain, OntologyMode, InferenceResponse, QueryRequest } from '@/lib/types'
 import { fetchInferenceQuery } from '@/lib/api'
 import { MOCK } from '@/lib/mockData'
 
@@ -9,6 +9,7 @@ const POLL = 30_000
 
 interface Props {
   domain: Domain
+  ontologyMode: OntologyMode
 }
 
 function edgeFillClass(status: string) {
@@ -34,13 +35,14 @@ function badgeColor(status: string) {
   return undefined
 }
 
-export default function EdgeExistencePanel({ domain }: Props) {
+export default function EdgeExistencePanel({ domain, ontologyMode }: Props) {
   const dominantId = MOCK[domain as keyof typeof MOCK].status.dominant_hypothesis.candidate_id
   const req: QueryRequest = {
     domain,
     target_variable: 'price_up',
     candidate_id: dominantId,
     aggregation: 'weighted_avg',
+    ontology_mode: ontologyMode,
   }
 
   const { data } = useSWR<InferenceResponse>(

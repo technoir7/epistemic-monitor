@@ -1,13 +1,14 @@
 'use client'
 
 import useSWR from 'swr'
-import type { Domain, CandidatesResponse, Candidate } from '@/lib/types'
+import type { Domain, OntologyMode, CandidatesResponse, Candidate } from '@/lib/types'
 import { fetchCandidates } from '@/lib/api'
 
 const POLL = 30_000
 
 interface Props {
   domain: Domain
+  ontologyMode: OntologyMode
 }
 
 function statusClass(s: Candidate['status']) {
@@ -50,9 +51,9 @@ function fmtScore(n: number) {
   return n.toFixed(1)
 }
 
-export default function OntologyPopulation({ domain }: Props) {
+export default function OntologyPopulation({ domain, ontologyMode }: Props) {
   const { data, error } = useSWR<CandidatesResponse>(
-    ['candidates', domain],
+    ['candidates', domain, ontologyMode],
     fetchCandidates,
     { refreshInterval: POLL, revalidateOnFocus: false },
   )

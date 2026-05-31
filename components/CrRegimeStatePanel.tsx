@@ -1,7 +1,7 @@
 'use client'
 
 import useSWR from 'swr'
-import type { Domain, CrVariableName } from '@/lib/types'
+import type { Domain, OntologyMode, CrVariableName } from '@/lib/types'
 
 const POLL = 30_000
 const API_BASE =
@@ -37,14 +37,14 @@ interface VariableProbabilityResponse {
 }
 
 async function fetchCrVariableProbabilities(
-  [, domain]: [string, Domain],
+  [, domain, mode]: [string, Domain, OntologyMode],
 ): Promise<CrRegimeProbabilityMap> {
   const entries = await Promise.all(
     VAR_ORDER.map(async name => {
       const res = await fetch(`${API_BASE}/v1/inference/query`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify({ domain, target_variable: name }),
+        body: JSON.stringify({ domain, target_variable: name, ontology_mode: mode }),
       })
 
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
@@ -63,11 +63,12 @@ async function fetchCrVariableProbabilities(
 
 interface Props {
   domain: Domain
+  ontologyMode: OntologyMode
 }
 
-export default function CrRegimeStatePanel({ domain }: Props) {
+export default function CrRegimeStatePanel({ domain, ontologyMode }: Props) {
   const { data, error } = useSWR<CrRegimeProbabilityMap>(
-    ['cr-regime-probabilities', domain],
+    ['cr-regime-probabilities', domain, ontologyMode],
     fetchCrVariableProbabilities,
     { refreshInterval: POLL, revalidateOnFocus: false },
   )

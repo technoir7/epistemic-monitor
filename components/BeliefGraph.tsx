@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 import useSWR from 'swr'
-import type { Domain, InferenceResponse, QueryRequest, GraphNode, GraphEdge } from '@/lib/types'
+import type { Domain, OntologyMode, InferenceResponse, QueryRequest, GraphNode, GraphEdge } from '@/lib/types'
 import { fetchInferenceQuery } from '@/lib/api'
 import { MOCK } from '@/lib/mockData'
 
@@ -90,11 +90,12 @@ function edgeDash(status: string): string {
 
 interface Props {
   domain: Domain
+  ontologyMode: OntologyMode
   /** Target variable for the inference query. Defaults to 'price_up'. */
   targetVariable?: string
 }
 
-export default function BeliefGraph({ domain, targetVariable = 'price_up' }: Props) {
+export default function BeliefGraph({ domain, ontologyMode, targetVariable = 'price_up' }: Props) {
   // Use mock candidate id when available; undefined for domains without mocks
   // (e.g. 'mr') — the API accepts candidate_id as optional.
   const dominantId = mockFor(domain)?.status.dominant_hypothesis.candidate_id
@@ -104,6 +105,7 @@ export default function BeliefGraph({ domain, targetVariable = 'price_up' }: Pro
     target_variable: targetVariable,
     candidate_id: dominantId,
     aggregation: 'weighted_avg',
+    ontology_mode: ontologyMode,
   }
 
   const { data, error } = useSWR<InferenceResponse>(

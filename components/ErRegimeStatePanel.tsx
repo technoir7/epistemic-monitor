@@ -1,7 +1,7 @@
 'use client'
 
 import useSWR from 'swr'
-import type { Domain, ErVariableName } from '@/lib/types'
+import type { Domain, OntologyMode, ErVariableName } from '@/lib/types'
 
 const POLL = 30_000
 const API_BASE =
@@ -37,14 +37,14 @@ interface VariableProbabilityResponse {
 }
 
 async function fetchErVariableProbabilities(
-  [, domain]: [string, Domain],
+  [, domain, mode]: [string, Domain, OntologyMode],
 ): Promise<ErRegimeProbabilityMap> {
   const entries = await Promise.all(
     VAR_ORDER.map(async name => {
       const res = await fetch(`${API_BASE}/v1/inference/query`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify({ domain, target_variable: name }),
+        body: JSON.stringify({ domain, target_variable: name, ontology_mode: mode }),
       })
 
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
@@ -63,11 +63,12 @@ async function fetchErVariableProbabilities(
 
 interface Props {
   domain: Domain
+  ontologyMode: OntologyMode
 }
 
-export default function ErRegimeStatePanel({ domain }: Props) {
+export default function ErRegimeStatePanel({ domain, ontologyMode }: Props) {
   const { data, error } = useSWR<ErRegimeProbabilityMap>(
-    ['er-regime-probabilities', domain],
+    ['er-regime-probabilities', domain, ontologyMode],
     fetchErVariableProbabilities,
     { refreshInterval: POLL, revalidateOnFocus: false },
   )

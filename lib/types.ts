@@ -1,5 +1,18 @@
 // ─── Shared ──────────────────────────────────────────────────────────────────
-export type Domain = 'mr' | 'ai' | 'ng' | 'sd' | 'cc' | 'er' | 'lm' | 'cr' | 'gp' | 'sf'
+export type Domain =
+  | 'mr'
+  | 'ai'
+  | 'ng'
+  | 'sd'
+  | 'cc'
+  | 'er'
+  | 'lm'
+  | 'cr'
+  | 'gp'
+  | 'sf'
+  | 'art'
+
+export type OntologyMode = 'dynamic' | 'apriori'
 
 // ─── GET /v1/population/status → EpistemicStateBar ───────────────────────────
 export interface PopulationStatus {
@@ -45,6 +58,7 @@ export interface QueryRequest {
   candidate_id?: string
   conditions?: Record<string, unknown>
   aggregation?: 'weighted_avg' | 'map' | 'marginal'
+  ontology_mode?: OntologyMode
 }
 
 export interface GraphNode {
@@ -229,6 +243,34 @@ export type SfVariableName =
   | 'StartupFormationRising'
   | 'FootTrafficRecovering'
   | 'PopulationFlowPositive'
+
+// ─── POST /v1/inference/query → ArtRegimeStatePanel ──────────────────────────
+export type ArtVariableName =
+  | 'InstitutionalRiskAversion'
+  | 'MuseumFigurativeAcceptance'
+  | 'ConceptualDominance'
+  | 'AIArtInstitutionalAcceptance'
+  | 'CuratorialMaterialityShift'
+  | 'CraftPrestigeRising'
+  | 'PrestigeFragmentation'
+  | 'RegionalSceneMomentum'
+  | 'BlueChipInstitutionalCapture'
+  | 'BiennialFatigue'
+  | 'MuseumAcquisitionMomentum'
+  | 'BlueChipConcentration'
+  | 'AuctionSpeculationElevated'
+  | 'CollectorFlightToSafety'
+  | 'FigurativeAuctionMomentum'
+  | 'EmergingMarketLiquidity'
+  | 'MarketPolarization'
+  | 'MarketUncertainty'
+  | 'RitualAuraPremium'
+  | 'EmbodimentDiscourseRising'
+  | 'AntiDigitalSentiment'
+  | 'AIImageSaturation'
+  | 'AuthenticityPremium'
+  | 'NeoAcademicResurgence'
+  | 'AttentionFragmentation'
 
 // ─── POST /v1/inference/query → LmRegimeStatePanel ───────────────────────────
 export type LmVariableName =

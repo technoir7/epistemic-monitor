@@ -1,13 +1,14 @@
 'use client'
 
 import useSWR from 'swr'
-import type { Domain, PopulationStatus, ShiftsResponse } from '@/lib/types'
+import type { Domain, OntologyMode, PopulationStatus, ShiftsResponse } from '@/lib/types'
 import { fetchPopulationShifts, fetchPopulationStatus } from '@/lib/api'
 
 const POLL = 30_000
 
 interface Props {
   domain: Domain
+  ontologyMode: OntologyMode
 }
 
 function EntropyColor(v: number) {
@@ -28,14 +29,14 @@ function EntropyLabel(v: number) {
   return 'low uncertainty'
 }
 
-export default function EpistemicStateBar({ domain }: Props) {
+export default function EpistemicStateBar({ domain, ontologyMode }: Props) {
   const { data, error } = useSWR<PopulationStatus>(
-    ['population-status', domain],
+    ['population-status', domain, ontologyMode],
     fetchPopulationStatus,
     { refreshInterval: POLL, revalidateOnFocus: false },
   )
   const { data: shiftsData } = useSWR<ShiftsResponse>(
-    ['population-shifts', domain],
+    ['population-shifts', domain, ontologyMode],
     fetchPopulationShifts,
     { refreshInterval: POLL, revalidateOnFocus: false },
   )

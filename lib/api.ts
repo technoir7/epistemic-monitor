@@ -1,5 +1,6 @@
 import type {
   Domain,
+  OntologyMode,
   PopulationStatus,
   CandidatesResponse,
   QueryRequest,
@@ -78,21 +79,21 @@ export async function triggerIngest(domain: Domain): Promise<void> {
 }
 
 export async function fetchPopulationStatus(
-  [, domain]: [string, Domain],
+  [, domain, mode]: [string, Domain, OntologyMode],
 ): Promise<PopulationStatus> {
   const m = mockFor(domain)
   return m
-    ? get(`/v1/population/status?domain=${domain}`, m.status)
-    : getRequired(`/v1/population/status?domain=${domain}`)
+    ? get(`/v1/population/status?domain=${domain}&ontology_mode=${mode}`, m.status)
+    : getRequired(`/v1/population/status?domain=${domain}&ontology_mode=${mode}`)
 }
 
 export async function fetchCandidates(
-  [, domain]: [string, Domain],
+  [, domain, mode]: [string, Domain, OntologyMode],
 ): Promise<CandidatesResponse> {
   const m = mockFor(domain)
   return m
-    ? get(`/v1/population/candidates?domain=${domain}`, m.candidates)
-    : getRequired(`/v1/population/candidates?domain=${domain}`)
+    ? get(`/v1/population/candidates?domain=${domain}&ontology_mode=${mode}`, m.candidates)
+    : getRequired(`/v1/population/candidates?domain=${domain}&ontology_mode=${mode}`)
 }
 
 export async function fetchInferenceQuery(
@@ -113,34 +114,34 @@ export async function fetchInferenceQuery(
 }
 
 export async function fetchLineage(
-  [, domain, candidateId]: [string, Domain, string],
+  [, domain, candidateId, mode]: [string, Domain, string, OntologyMode],
 ): Promise<LineageResponse> {
   const m = mockFor(domain)
   return m
-    ? get(`/v1/population/lineage/${encodeURIComponent(candidateId)}?domain=${domain}`, m.lineage)
-    : getRequired(`/v1/population/lineage/${encodeURIComponent(candidateId)}?domain=${domain}`)
+    ? get(`/v1/population/lineage/${encodeURIComponent(candidateId)}?domain=${domain}&ontology_mode=${mode}`, m.lineage)
+    : getRequired(`/v1/population/lineage/${encodeURIComponent(candidateId)}?domain=${domain}&ontology_mode=${mode}`)
 }
 
 export async function fetchPopulationShifts(
-  [, domain]: [string, Domain],
+  [, domain, mode]: [string, Domain, OntologyMode],
 ): Promise<ShiftsResponse> {
-  return getRequired(`/v1/population/shifts?domain=${encodeURIComponent(domain)}`)
+  return getRequired(`/v1/population/shifts?domain=${encodeURIComponent(domain)}&ontology_mode=${mode}`)
 }
 
 export async function fetchRecentEvidence(
-  [, domain]: [string, Domain],
+  [, domain, mode]: [string, Domain, OntologyMode],
 ): Promise<EvidenceResponse> {
   const m = mockFor(domain)
   return m
-    ? get(`/v1/evidence/recent?domain=${domain}`, m.evidence)
-    : getRequired(`/v1/evidence/recent?domain=${domain}`)
+    ? get(`/v1/evidence/recent?domain=${domain}&ontology_mode=${mode}`, m.evidence)
+    : getRequired(`/v1/evidence/recent?domain=${domain}&ontology_mode=${mode}`)
 }
 
 // ─── MR-specific: regime state (no mock — errors surface visibly) ─────────────
 export async function fetchMrRegimeState(
-  [, domain]: [string, Domain],
+  [, domain, mode]: [string, Domain, OntologyMode],
 ): Promise<MrEvidenceResponse> {
-  return getRequired(`/v1/evidence/recent?domain=${domain}`)
+  return getRequired(`/v1/evidence/recent?domain=${domain}&ontology_mode=${mode}`)
 }
 
 export async function fetchEntropyDebug(domain: Domain): Promise<EntropyDebugResponse> {

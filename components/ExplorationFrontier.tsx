@@ -1,7 +1,7 @@
 'use client'
 
 import useSWR from 'swr'
-import type { Domain, CandidatesResponse, InferenceResponse, QueryRequest } from '@/lib/types'
+import type { Domain, OntologyMode, CandidatesResponse, InferenceResponse, QueryRequest } from '@/lib/types'
 import { fetchCandidates, fetchInferenceQuery } from '@/lib/api'
 import { MOCK } from '@/lib/mockData'
 
@@ -18,17 +18,19 @@ const TARGET_VARIABLE_BY_DOMAIN: Record<Domain, string> = {
   cr: 'BTCMomentumPositive',
   gp: 'ConflictIntensityElevated',
   sf: 'TechHiringAccelerating',
+  art: 'CraftPrestigeRising',
 }
 
 interface Props {
   domain: Domain
+  ontologyMode: OntologyMode
 }
 
-export default function ExplorationFrontier({ domain }: Props) {
+export default function ExplorationFrontier({ domain, ontologyMode }: Props) {
   const mock = (MOCK as Record<string, typeof MOCK[keyof typeof MOCK] | undefined>)[domain]
 
   const { data: candidatesData } = useSWR<CandidatesResponse>(
-    ['candidates', domain],
+    ['candidates', domain, ontologyMode],
     fetchCandidates,
     { refreshInterval: POLL, revalidateOnFocus: false },
   )
@@ -44,6 +46,7 @@ export default function ExplorationFrontier({ domain }: Props) {
         target_variable: TARGET_VARIABLE_BY_DOMAIN[domain],
         candidate_id: dominantId,
         aggregation: 'weighted_avg',
+        ontology_mode: ontologyMode,
       }
     : null
 
