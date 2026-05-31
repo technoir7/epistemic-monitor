@@ -10,6 +10,8 @@ import type {
   EvidenceResponse,
   EntropyDebugResponse,
   MrEvidenceResponse,
+  DomainReport,
+  DomainReportEmpty,
 } from './types'
 import { MOCK } from './mockData'
 
@@ -146,4 +148,31 @@ export async function fetchMrRegimeState(
 
 export async function fetchEntropyDebug(domain: Domain): Promise<EntropyDebugResponse> {
   return getRequired(`/v1/debug/entropy?domain=${encodeURIComponent(domain)}`)
+}
+
+// ─── Report endpoints ─────────────────────────────────────────────────────────
+
+export async function fetchCachedReport(
+  [, domain, mode]: [string, Domain, OntologyMode],
+): Promise<DomainReport | DomainReportEmpty> {
+  // Never throws — returns {found: false} when no cached report exists.
+  return get(
+    `/v1/report/${encodeURIComponent(domain)}?ontology_mode=${mode}`,
+    { found: false, domain, ontology_mode: mode } as DomainReportEmpty,
+  )
+}
+
+export async function refreshReport(
+  domain: Domain,
+  mode: OntologyMode,
+): Promise<DomainReport> {
+  const res = await fetch(
+    `${API_BASE}/v1/report/${encodeURIComponent(domain)}/refresh?ontology_mode=${mode}`,
+    { method: 'POST', headers: { Accept: 'application/json' } },
+  )
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}))
+    throw new Error(body?.detail ?? `HTTP ${res.status}`)
+  }
+  return (await res.json()) as DomainReport
 }

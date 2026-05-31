@@ -11,6 +11,7 @@ import EdgeExistencePanel  from '@/components/EdgeExistencePanel'
 import EvidenceStream      from '@/components/EvidenceStream'
 import ParadigmShiftTimeline from '@/components/ParadigmShiftTimeline'
 import ExplorationFrontier from '@/components/ExplorationFrontier'
+import DomainReport        from '@/components/DomainReport'
 import PromptLine          from '@/components/PromptLine'
 import RegimeStatePanel    from '@/components/RegimeStatePanel'
 import AiRegimeStatePanel  from '@/components/AiRegimeStatePanel'
@@ -244,6 +245,7 @@ function DomainPanels({ domain, visible, ontologyMode }: { domain: Domain; visib
       <EvidenceStream      domain={domain} ontologyMode={ontologyMode} />
       <ParadigmShiftTimeline domain={domain} ontologyMode={ontologyMode} />
       <ExplorationFrontier domain={domain} ontologyMode={ontologyMode} />
+      <DomainReport        domain={domain} ontologyMode={ontologyMode} />
       <PromptLine          domain={domain} />
     </div>
   )
@@ -267,6 +269,7 @@ function MrDomainPanels({ visible, ontologyMode }: { visible: boolean; ontologyM
           GET /v1/population/status?domain=mr; no mock needed */}
       <ParadigmShiftTimeline domain="mr" ontologyMode={ontologyMode} />
       <ExplorationFrontier domain="mr" ontologyMode={ontologyMode} />
+      <DomainReport domain="mr" ontologyMode={ontologyMode} />
       {/* Row 6: terminal prompt line */}
       <PromptLine domain="mr" />
     </div>
@@ -289,6 +292,7 @@ function AiDomainPanels({ visible, ontologyMode }: { visible: boolean; ontologyM
       {/* Paradigm shift history */}
       <ParadigmShiftTimeline domain="ai" ontologyMode={ontologyMode} />
       <ExplorationFrontier domain="ai" ontologyMode={ontologyMode} />
+      <DomainReport domain="ai" ontologyMode={ontologyMode} />
       {/* Row: terminal prompt line */}
       <PromptLine domain="ai" />
     </div>
@@ -305,6 +309,7 @@ function SdDomainPanels({ visible, ontologyMode }: { visible: boolean; ontologyM
       <OntologyPopulation domain="sd" ontologyMode={ontologyMode} />
       <ParadigmShiftTimeline domain="sd" ontologyMode={ontologyMode} />
       <ExplorationFrontier domain="sd" ontologyMode={ontologyMode} />
+      <DomainReport domain="sd" ontologyMode={ontologyMode} />
       <PromptLine domain="sd" />
     </div>
   )
@@ -320,6 +325,7 @@ function CcDomainPanels({ visible, ontologyMode }: { visible: boolean; ontologyM
       <OntologyPopulation domain="cc" ontologyMode={ontologyMode} />
       <ParadigmShiftTimeline domain="cc" ontologyMode={ontologyMode} />
       <ExplorationFrontier domain="cc" ontologyMode={ontologyMode} />
+      <DomainReport domain="cc" ontologyMode={ontologyMode} />
       <PromptLine domain="cc" />
     </div>
   )
@@ -335,6 +341,7 @@ function ErDomainPanels({ visible, ontologyMode }: { visible: boolean; ontologyM
       <OntologyPopulation domain="er" ontologyMode={ontologyMode} />
       <ParadigmShiftTimeline domain="er" ontologyMode={ontologyMode} />
       <ExplorationFrontier domain="er" ontologyMode={ontologyMode} />
+      <DomainReport domain="er" ontologyMode={ontologyMode} />
       <PromptLine domain="er" />
     </div>
   )
@@ -350,6 +357,7 @@ function LmDomainPanels({ visible, ontologyMode }: { visible: boolean; ontologyM
       <OntologyPopulation domain="lm" ontologyMode={ontologyMode} />
       <ParadigmShiftTimeline domain="lm" ontologyMode={ontologyMode} />
       <ExplorationFrontier domain="lm" ontologyMode={ontologyMode} />
+      <DomainReport domain="lm" ontologyMode={ontologyMode} />
       <PromptLine domain="lm" />
     </div>
   )
@@ -365,6 +373,7 @@ function CrDomainPanels({ visible, ontologyMode }: { visible: boolean; ontologyM
       <OntologyPopulation domain="cr" ontologyMode={ontologyMode} />
       <ParadigmShiftTimeline domain="cr" ontologyMode={ontologyMode} />
       <ExplorationFrontier domain="cr" ontologyMode={ontologyMode} />
+      <DomainReport domain="cr" ontologyMode={ontologyMode} />
       <PromptLine domain="cr" />
     </div>
   )
@@ -380,6 +389,7 @@ function GpDomainPanels({ visible, ontologyMode }: { visible: boolean; ontologyM
       <OntologyPopulation domain="gp" ontologyMode={ontologyMode} />
       <ParadigmShiftTimeline domain="gp" ontologyMode={ontologyMode} />
       <ExplorationFrontier domain="gp" ontologyMode={ontologyMode} />
+      <DomainReport domain="gp" ontologyMode={ontologyMode} />
       <PromptLine domain="gp" />
     </div>
   )
@@ -395,6 +405,7 @@ function SfDomainPanels({ visible, ontologyMode }: { visible: boolean; ontologyM
       <OntologyPopulation domain="sf" ontologyMode={ontologyMode} />
       <ParadigmShiftTimeline domain="sf" ontologyMode={ontologyMode} />
       <ExplorationFrontier domain="sf" ontologyMode={ontologyMode} />
+      <DomainReport domain="sf" ontologyMode={ontologyMode} />
       <PromptLine domain="sf" />
     </div>
   )
@@ -410,6 +421,7 @@ function ArtDomainPanels({ visible, ontologyMode }: { visible: boolean; ontology
       <OntologyPopulation domain="art" ontologyMode={ontologyMode} />
       <ParadigmShiftTimeline domain="art" ontologyMode={ontologyMode} />
       <ExplorationFrontier domain="art" ontologyMode={ontologyMode} />
+      <DomainReport domain="art" ontologyMode={ontologyMode} />
       <PromptLine domain="art" />
     </div>
   )
@@ -431,6 +443,7 @@ function isActiveDomainPanelKey(key: unknown, domain: Domain): boolean {
 export default function Dashboard() {
   const [active, setActive] = useState<Domain>('mr')
   const [ontologyMode, setOntologyMode] = useState<OntologyMode>('dynamic')
+  const effectiveMode: OntologyMode = active === 'art' ? ontologyMode : 'apriori'
   const [explainOpen, setExplainOpen] = useState(false)
   const [fetchState, setFetchState] = useState<FetchState>('idle')
   const [exportState, setExportState] = useState<ExportState>('idle')
@@ -478,7 +491,7 @@ export default function Dashboard() {
     setExportState('exporting')
 
     try {
-      const res = await fetch(`${API_BASE}/v1/export/narrative-snapshot?domain=${domain}`, {
+      const res = await fetch(`${API_BASE}/v1/export/narrative-snapshot?domain=${domain}&ontology_mode=${effectiveMode}`, {
         headers: { Accept: 'application/json' },
       })
 
@@ -614,24 +627,31 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* ── Ontology mode toggle ── */}
-      <div className="mode-tabs">
-        <span className="mode-tabs-label">ontology_mode :</span>
-        <div
-          className={`mode-tab ${ontologyMode === 'dynamic' ? 'active' : ''}`}
-          onClick={() => setOntologyMode('dynamic')}
-        >
-          <span className="tab-ticker">DY</span>
-          Dynamic Concepts
+      {/* ── Ontology mode toggle — art domain only ── */}
+      {active === 'art' && (
+        <div className="mode-tabs">
+          <span className="mode-tabs-label">ontology_mode :</span>
+          <div
+            className={`mode-tab ${ontologyMode === 'dynamic' ? 'active' : ''}`}
+            onClick={() => setOntologyMode('dynamic')}
+          >
+            <span className="tab-ticker">DY</span>
+            Dynamic Concepts
+          </div>
+          <div
+            className={`mode-tab ${ontologyMode === 'apriori' ? 'active' : ''}`}
+            onClick={() => setOntologyMode('apriori')}
+          >
+            <span className="tab-ticker">AP</span>
+            A Priori Concepts
+          </div>
+          {process.env.NODE_ENV === 'development' && (
+            <span style={{ marginLeft: 'auto', fontSize: 10, fontFamily: 'var(--font-mono)', color: 'var(--text-dim)', opacity: 0.6, userSelect: 'none' }}>
+              dbg: domain={active} mode={ontologyMode}
+            </span>
+          )}
         </div>
-        <div
-          className={`mode-tab ${ontologyMode === 'apriori' ? 'active' : ''}`}
-          onClick={() => setOntologyMode('apriori')}
-        >
-          <span className="tab-ticker">AP</span>
-          A Priori Concepts
-        </div>
-      </div>
+      )}
 
       {/* ── Domain tabs ── */}
       <div className="domain-tabs">
@@ -658,19 +678,19 @@ export default function Dashboard() {
           `display: contents` passes grid children through; `display: none` hides.
           MR uses its own panel set; commodity domains share DomainPanels.
         */}
-        <MrDomainPanels visible={active === 'mr'} ontologyMode={ontologyMode} />
-        <AiDomainPanels visible={active === 'ai'} ontologyMode={ontologyMode} />
+        <MrDomainPanels visible={active === 'mr'} ontologyMode={effectiveMode} />
+        <AiDomainPanels visible={active === 'ai'} ontologyMode={effectiveMode} />
         {/* NG uses the generic commodity DomainPanels with full mock support */}
-        <DomainPanels domain="ng" visible={active === 'ng'} ontologyMode={ontologyMode} />
+        <DomainPanels domain="ng" visible={active === 'ng'} ontologyMode={effectiveMode} />
         {/* New macro domains — no mock fallback, API errors surface visibly */}
-        <SdDomainPanels visible={active === 'sd'} ontologyMode={ontologyMode} />
-        <CcDomainPanels visible={active === 'cc'} ontologyMode={ontologyMode} />
-        <ErDomainPanels visible={active === 'er'} ontologyMode={ontologyMode} />
-        <LmDomainPanels visible={active === 'lm'} ontologyMode={ontologyMode} />
-        <CrDomainPanels visible={active === 'cr'} ontologyMode={ontologyMode} />
-        <GpDomainPanels visible={active === 'gp'} ontologyMode={ontologyMode} />
-        <SfDomainPanels visible={active === 'sf'} ontologyMode={ontologyMode} />
-        <ArtDomainPanels visible={active === 'art'} ontologyMode={ontologyMode} />
+        <SdDomainPanels visible={active === 'sd'} ontologyMode={effectiveMode} />
+        <CcDomainPanels visible={active === 'cc'} ontologyMode={effectiveMode} />
+        <ErDomainPanels visible={active === 'er'} ontologyMode={effectiveMode} />
+        <LmDomainPanels visible={active === 'lm'} ontologyMode={effectiveMode} />
+        <CrDomainPanels visible={active === 'cr'} ontologyMode={effectiveMode} />
+        <GpDomainPanels visible={active === 'gp'} ontologyMode={effectiveMode} />
+        <SfDomainPanels visible={active === 'sf'} ontologyMode={effectiveMode} />
+        <ArtDomainPanels visible={active === 'art'} ontologyMode={effectiveMode} />
       </div>
     </div>
   )

@@ -164,6 +164,20 @@ interface Props {
 }
 
 export default function ArtRegimeStatePanel({ domain, ontologyMode }: Props) {
+  if (ontologyMode === 'dynamic') {
+    return (
+      <div className="panel regime-panel">
+        <div className="panel-label" style={{ color: 'var(--text-dim)' }}>
+          regime_state · dynamic not available
+        </div>
+        <div style={{ color: 'var(--text-dim)', fontSize: 10, padding: '4px 0' }}>
+          Dynamic mode uses POE-A induced concepts, not apriori art variables.
+          View the export snapshot for dynamic ontology state.
+        </div>
+      </div>
+    )
+  }
+
   const { data, error } = useSWR<ArtRegimeState>(
     ['art-regime-probabilities', domain, ontologyMode],
     fetchArtVariableProbabilities,

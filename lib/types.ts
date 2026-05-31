@@ -312,3 +312,23 @@ export interface EntropyDebugResponse {
   unique_observed_patterns: ObservedPatternDebug[]
   pairwise_mutual_information: PairwiseMutualInformationDebug[]
 }
+
+// ─── GET /v1/report/{domain} and POST /v1/report/{domain}/refresh ────────────
+export interface DomainReport {
+  found: true
+  domain: string
+  ontology_mode: string
+  generated_at: string
+  snapshot_hash: string
+  report: string
+  cached: boolean
+  regenerated: boolean
+  stale: boolean
+}
+
+export interface DomainReportEmpty {
+  found: false
+  domain: string
+  ontology_mode: string
+}
+
