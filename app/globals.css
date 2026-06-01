@@ -944,6 +944,11 @@ header {
 .report-para strong { color: var(--text); }
 .report-para em     { color: var(--amber); font-style: normal; }
 
+/* ── Report section (outside main grid) ── */
+.report-section {
+  margin-top: 8px;
+}
+
 /* ── Scrollbar global ── */
 ::-webkit-scrollbar       { width: 4px; height: 4px; }
 ::-webkit-scrollbar-track { background: var(--border); }
@@ -1225,4 +1230,184 @@ header {
   min-width: 34px;
   text-align: right;
   white-space: nowrap;
+}
+
+/* ── Responsive: Tablet (≤ 900px) ── */
+@media (max-width: 900px) {
+  header { gap: 12px; flex-wrap: wrap; }
+
+  .header-left h1 { font-size: 28px; }
+
+  .domain-tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .explain-btn,
+  .fetch-btn { font-size: 10px; padding: 5px 10px; }
+}
+
+/* ── Responsive: Mobile (≤ 640px) ── */
+@media (max-width: 640px) {
+  /* Shell */
+  .shell { padding: 0 12px 24px; }
+
+  /* Header: stack vertically, smaller type */
+  header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 14px 0 12px;
+    flex-wrap: wrap;
+  }
+
+  .header-left h1 {
+    font-size: 18px;
+    white-space: normal;
+    word-break: break-word;
+    letter-spacing: 0.06em;
+  }
+
+  .header-left .subtitle {
+    white-space: normal;
+    flex-wrap: wrap;
+    gap: 4px 8px;
+    font-size: 9px;
+    letter-spacing: 0.06em;
+  }
+
+  .header-right {
+    width: 100%;
+    gap: 8px;
+    flex-wrap: wrap;
+    font-size: 9px;
+    letter-spacing: 0.05em;
+  }
+
+  .clock { font-size: 20px; }
+
+  .explain-btn,
+  .fetch-btn {
+    font-size: 9px;
+    padding: 4px 8px;
+    letter-spacing: 0.05em;
+  }
+
+  /* Domain tabs: horizontal scroll, no wrap */
+  .domain-tabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    flex-wrap: nowrap;
+    margin-bottom: 12px;
+  }
+
+  .domain-tab {
+    padding: 6px 10px;
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+    min-width: max-content;
+  }
+
+  .tab-ticker { font-size: 14px; }
+
+  /* Mode tabs */
+  .mode-tabs { flex-wrap: wrap; }
+  .mode-tab  { padding: 5px 12px; font-size: 9px; }
+
+  /* Explanation overlay: single column */
+  .exp-grid { grid-template-columns: 1fr; }
+  .exp-term { flex-direction: column; gap: 2px; }
+  .exp-term-key { min-width: 0; white-space: normal; }
+
+  /* ── Main grid: single column, auto heights ── */
+  .main-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: none;
+    grid-auto-rows: auto;
+    gap: 6px;
+  }
+
+  /* Reset all explicit grid placements */
+  .epistemic-state  { grid-column: 1; grid-row: auto; }
+  .belief-graph-panel { grid-column: 1; grid-row: auto; }
+  .edge-panel       { grid-column: 1; grid-row: auto; }
+  .evidence-panel   { grid-column: 1; grid-row: auto; }
+  .regime-panel     { grid-column: 1; grid-row: auto; }
+  .population-panel { grid-column: 1; grid-row: auto; }
+  .shift-panel      { grid-column: 1; }
+  .frontier-panel   { grid-column: 1; }
+  .prompt-line      { grid-column: 1; }
+
+  /* Epistemic state: 3-column grid of metrics instead of 5-in-a-row */
+  .epistemic-state {
+    max-height: none;
+    grid-template-columns: repeat(3, 1fr);
+    overflow-x: visible;
+  }
+
+  .state-metric { padding: 10px 8px; }
+
+  /* Remove right border on every 3rd metric (end of row) and last child */
+  .state-metric:nth-child(3n) { border-right: none; }
+  .state-metric:last-child    { border-right: none; }
+
+  /* Restore border on 4th metric (start of 2nd row) if it was removed by :nth-child(3n) */
+  .state-metric:nth-child(4) { border-right: 1px solid var(--border); }
+
+  .metric-value { font-size: 30px; }
+  .metric-label { letter-spacing: 0.08em; font-size: 7px; }
+
+  /* Belief graph */
+  .graph-canvas {
+    height: 220px;
+    min-height: 220px;
+    max-height: 220px;
+  }
+
+  /* Edge panel */
+  .edge-panel {
+    height: auto;
+    max-height: none;
+  }
+
+  /* Evidence stream */
+  .evidence-panel {
+    height: auto;
+    max-height: none;
+  }
+
+  /* Regime state (MR/AI/etc variable panel) */
+  .regime-panel {
+    overflow: visible;
+    height: auto;
+  }
+
+  .regime-var-list {
+    max-height: 300px;
+    overflow-y: auto;
+  }
+
+  .regime-var-row {
+    grid-template-columns: 100px 44px 1fr;
+    gap: 6px;
+  }
+
+  .regime-var-name { font-size: 8px; }
+
+  /* Population (ontology candidates) */
+  .population-panel {
+    max-height: none;
+  }
+
+  /* Report body type scale */
+  .report-para    { font-size: 11px; line-height: 1.65; }
+  .report-heading { font-size: 9px; }
+
+  /* Prompt line: allow wrapping */
+  .prompt-line {
+    white-space: normal;
+    flex-wrap: wrap;
+    font-size: 10px;
+  }
 }

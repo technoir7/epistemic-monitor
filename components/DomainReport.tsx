@@ -77,7 +77,7 @@ export default function DomainReport({ domain, ontologyMode }: Props) {
   const btnLabel = refreshing ? '[ updating… ]' : '[ update report ]'
 
   return (
-    <div className="report-panel" style={{ gridColumn: '1 / -1' }}>
+    <div className="report-panel">
 
       {/* Header row: label + metadata + button */}
       <div className="report-header">

@@ -245,7 +245,6 @@ function DomainPanels({ domain, visible, ontologyMode }: { domain: Domain; visib
       <EvidenceStream      domain={domain} ontologyMode={ontologyMode} />
       <ParadigmShiftTimeline domain={domain} ontologyMode={ontologyMode} />
       <ExplorationFrontier domain={domain} ontologyMode={ontologyMode} />
-      <DomainReport        domain={domain} ontologyMode={ontologyMode} />
       <PromptLine          domain={domain} />
     </div>
   )
@@ -269,7 +268,6 @@ function MrDomainPanels({ visible, ontologyMode }: { visible: boolean; ontologyM
           GET /v1/population/status?domain=mr; no mock needed */}
       <ParadigmShiftTimeline domain="mr" ontologyMode={ontologyMode} />
       <ExplorationFrontier domain="mr" ontologyMode={ontologyMode} />
-      <DomainReport domain="mr" ontologyMode={ontologyMode} />
       {/* Row 6: terminal prompt line */}
       <PromptLine domain="mr" />
     </div>
@@ -292,7 +290,6 @@ function AiDomainPanels({ visible, ontologyMode }: { visible: boolean; ontologyM
       {/* Paradigm shift history */}
       <ParadigmShiftTimeline domain="ai" ontologyMode={ontologyMode} />
       <ExplorationFrontier domain="ai" ontologyMode={ontologyMode} />
-      <DomainReport domain="ai" ontologyMode={ontologyMode} />
       {/* Row: terminal prompt line */}
       <PromptLine domain="ai" />
     </div>
@@ -309,7 +306,6 @@ function SdDomainPanels({ visible, ontologyMode }: { visible: boolean; ontologyM
       <OntologyPopulation domain="sd" ontologyMode={ontologyMode} />
       <ParadigmShiftTimeline domain="sd" ontologyMode={ontologyMode} />
       <ExplorationFrontier domain="sd" ontologyMode={ontologyMode} />
-      <DomainReport domain="sd" ontologyMode={ontologyMode} />
       <PromptLine domain="sd" />
     </div>
   )
@@ -325,7 +321,6 @@ function CcDomainPanels({ visible, ontologyMode }: { visible: boolean; ontologyM
       <OntologyPopulation domain="cc" ontologyMode={ontologyMode} />
       <ParadigmShiftTimeline domain="cc" ontologyMode={ontologyMode} />
       <ExplorationFrontier domain="cc" ontologyMode={ontologyMode} />
-      <DomainReport domain="cc" ontologyMode={ontologyMode} />
       <PromptLine domain="cc" />
     </div>
   )
@@ -341,7 +336,6 @@ function ErDomainPanels({ visible, ontologyMode }: { visible: boolean; ontologyM
       <OntologyPopulation domain="er" ontologyMode={ontologyMode} />
       <ParadigmShiftTimeline domain="er" ontologyMode={ontologyMode} />
       <ExplorationFrontier domain="er" ontologyMode={ontologyMode} />
-      <DomainReport domain="er" ontologyMode={ontologyMode} />
       <PromptLine domain="er" />
     </div>
   )
@@ -357,7 +351,6 @@ function LmDomainPanels({ visible, ontologyMode }: { visible: boolean; ontologyM
       <OntologyPopulation domain="lm" ontologyMode={ontologyMode} />
       <ParadigmShiftTimeline domain="lm" ontologyMode={ontologyMode} />
       <ExplorationFrontier domain="lm" ontologyMode={ontologyMode} />
-      <DomainReport domain="lm" ontologyMode={ontologyMode} />
       <PromptLine domain="lm" />
     </div>
   )
@@ -373,7 +366,6 @@ function CrDomainPanels({ visible, ontologyMode }: { visible: boolean; ontologyM
       <OntologyPopulation domain="cr" ontologyMode={ontologyMode} />
       <ParadigmShiftTimeline domain="cr" ontologyMode={ontologyMode} />
       <ExplorationFrontier domain="cr" ontologyMode={ontologyMode} />
-      <DomainReport domain="cr" ontologyMode={ontologyMode} />
       <PromptLine domain="cr" />
     </div>
   )
@@ -389,7 +381,6 @@ function GpDomainPanels({ visible, ontologyMode }: { visible: boolean; ontologyM
       <OntologyPopulation domain="gp" ontologyMode={ontologyMode} />
       <ParadigmShiftTimeline domain="gp" ontologyMode={ontologyMode} />
       <ExplorationFrontier domain="gp" ontologyMode={ontologyMode} />
-      <DomainReport domain="gp" ontologyMode={ontologyMode} />
       <PromptLine domain="gp" />
     </div>
   )
@@ -405,7 +396,6 @@ function SfDomainPanels({ visible, ontologyMode }: { visible: boolean; ontologyM
       <OntologyPopulation domain="sf" ontologyMode={ontologyMode} />
       <ParadigmShiftTimeline domain="sf" ontologyMode={ontologyMode} />
       <ExplorationFrontier domain="sf" ontologyMode={ontologyMode} />
-      <DomainReport domain="sf" ontologyMode={ontologyMode} />
       <PromptLine domain="sf" />
     </div>
   )
@@ -421,7 +411,6 @@ function ArtDomainPanels({ visible, ontologyMode }: { visible: boolean; ontology
       <OntologyPopulation domain="art" ontologyMode={ontologyMode} />
       <ParadigmShiftTimeline domain="art" ontologyMode={ontologyMode} />
       <ExplorationFrontier domain="art" ontologyMode={ontologyMode} />
-      <DomainReport domain="art" ontologyMode={ontologyMode} />
       <PromptLine domain="art" />
     </div>
   )
@@ -677,6 +666,9 @@ export default function Dashboard() {
           All domain panels are always mounted so SWR polls them independently.
           `display: contents` passes grid children through; `display: none` hides.
           MR uses its own panel set; commodity domains share DomainPanels.
+          DomainReport is intentionally NOT inside this grid — it lives below in
+          .report-section so its natural height contributes to document scroll height
+          rather than being capped at the 88px grid-auto-row.
         */}
         <MrDomainPanels visible={active === 'mr'} ontologyMode={effectiveMode} />
         <AiDomainPanels visible={active === 'ai'} ontologyMode={effectiveMode} />
@@ -691,6 +683,23 @@ export default function Dashboard() {
         <GpDomainPanels visible={active === 'gp'} ontologyMode={effectiveMode} />
         <SfDomainPanels visible={active === 'sf'} ontologyMode={effectiveMode} />
         <ArtDomainPanels visible={active === 'art'} ontologyMode={effectiveMode} />
+      </div>
+
+      {/*
+        ── Domain report section ──
+        All 11 reports stay mounted so SWR caches stay warm on domain switch.
+        Only the active domain's report is visible. Positioned outside the grid
+        so the panel's full height contributes to the document's scrollable area.
+      */}
+      <div className="report-section">
+        {DOMAINS.map(d => (
+          <div key={d.key} style={{ display: active === d.key ? 'block' : 'none' }}>
+            <DomainReport
+              domain={d.key}
+              ontologyMode={d.key === 'art' ? ontologyMode : 'apriori'}
+            />
+          </div>
+        ))}
       </div>
     </div>
   )
