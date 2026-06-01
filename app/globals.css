@@ -1404,6 +1404,30 @@ header {
   .report-para    { font-size: 11px; line-height: 1.65; }
   .report-heading { font-size: 9px; }
 
+  /* Report header: wrap button to its own line so it stays inside the panel */
+  .report-header {
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: flex-start;
+  }
+
+  /* Allow panel-label to shrink below its content size */
+  .report-header > .panel-label {
+    min-width: 0;
+    flex-shrink: 1;
+  }
+
+  /* Hide verbose timestamp/hash on mobile — the badge (CACHED/GENERATED/STALE) suffices */
+  .report-ts,
+  .report-hash { display: none; }
+
+  /* Prevent report panel from overflowing the page */
+  .report-section,
+  .report-panel { overflow-x: hidden; max-width: 100%; }
+
+  /* Shell-level overflow guard — catches any element that slips past panel clipping */
+  .shell { overflow-x: hidden; }
+
   /* Prompt line: allow wrapping */
   .prompt-line {
     white-space: normal;
