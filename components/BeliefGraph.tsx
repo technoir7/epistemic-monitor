@@ -68,6 +68,17 @@ function nodeTextColor(status: GraphNode['status']): string {
   }
 }
 
+const LAG_SUFFIX = '_prev'
+
+function displayLabel(label: string): string {
+  return label.endsWith(LAG_SUFFIX) ? `${label.slice(0, -LAG_SUFFIX.length)} t-1` : label
+}
+
+// Share Tech Mono is monospaced: about 0.6em per character.
+function boxWidth(label: string, fontSize: number, min: number): number {
+  return Math.max(min, Math.ceil(label.length * fontSize * 0.6) + 10)
+}
+
 function edgeStroke(status: string): string {
   if (status === 'strong')  return C.greenDim
   if (status === 'explore') return C.amber
@@ -164,7 +175,13 @@ export default function BeliefGraph({ domain, ontologyMode, targetVariable = 'pr
       merge.append('feMergeNode').attr('in', 'SourceGraphic')
 
       // ── Prepare simulation data (deep-clone to avoid mutating SWR cache) ──
-      const nodes: SimNode[] = data.nodes.map(n => ({ ...n }))
+      // A domain may hold each signal's value last period ("X_prev"). Those
+      // only matter where they explain something; unlinked, they double the
+      // graph with noise.
+      const linked = new Set(data.edges.flatMap(e => [e.source, e.target]))
+      const nodes: SimNode[] = data.nodes
+        .filter(n => !n.label.endsWith(LAG_SUFFIX) || linked.has(n.id))
+        .map(n => ({ ...n, label: displayLabel(n.label) }))
       const nodeById = new Map(nodes.map(n => [n.id, n]))
 
       const links: SimLink[] = data.edges.map(e => ({
@@ -175,7 +192,10 @@ export default function BeliefGraph({ domain, ontologyMode, targetVariable = 'pr
       }))
 
       // ── Force simulation ──────────────────────────────────────────────────
-      const manyNodes = data.nodes.length >= 7
+      const manyNodes = nodes.length >= 7
+      // Shrink nodes slightly when there are many (e.g. 8 for MR domain)
+      const NH = manyNodes ? 32 : 40
+      const width = (n: SimNode) => boxWidth(n.label, 9, manyNodes ? 58 : 76)
       const sim = d3.forceSimulation<SimNode>(nodes)
         .force('link',
           d3.forceLink<SimNode, SimLink>(links)
@@ -185,7 +205,7 @@ export default function BeliefGraph({ domain, ontologyMode, targetVariable = 'pr
         )
         .force('charge', d3.forceManyBody<SimNode>().strength(manyNodes ? -220 : -320))
         .force('center', d3.forceCenter(W / 2, H / 2))
-        .force('collision', d3.forceCollide<SimNode>(manyNodes ? 40 : 52))
+        .force('collision', d3.forceCollide<SimNode>(n => Math.max(width(n) / 2, manyNodes ? 40 : 52) + 4))
         .alphaDecay(0.04)
 
       // ── Edge group ───────────────────────────────────────────────────────
@@ -229,14 +249,10 @@ export default function BeliefGraph({ domain, ontologyMode, targetVariable = 'pr
         .append('g')
         .attr('filter', d => d.status === 'target' ? 'url(#glow-target)' : null)
 
-      // Shrink nodes slightly when there are many (e.g. 8 for MR domain)
-      const NW = data.nodes.length >= 7 ? 58 : 76
-      const NH = data.nodes.length >= 7 ? 32 : 40
-
       nodeGroups.append('rect')
-        .attr('x', -NW / 2)
+        .attr('x', d => -width(d) / 2)
         .attr('y', -NH / 2)
-        .attr('width', NW)
+        .attr('width', width)
         .attr('height', NH)
         .attr('fill', d => d.status === 'target' ? '#001505' : nodeFill(d.status))
         .attr('stroke', d => nodeStroke(d.status))
@@ -295,7 +311,7 @@ export default function BeliefGraph({ domain, ontologyMode, targetVariable = 'pr
       sim.on('tick', () => {
         // Clamp to SVG bounds
         nodes.forEach(n => {
-          n.x = Math.max(NW / 2 + 4, Math.min(W - NW / 2 - 4, n.x ?? W / 2))
+          n.x = Math.max(width(n) / 2 + 4, Math.min(W - width(n) / 2 - 4, n.x ?? W / 2))
           n.y = Math.max(NH / 2 + 4, Math.min(H - 24, n.y ?? H / 2))
         })
 
