@@ -233,8 +233,7 @@ function Clock() {
   return <div className="clock">{time || '--:--:--'}</div>
 }
 
-// Each commodity domain's full panel set — always rendered for independent polling.
-// CSS display toggles visibility rather than unmounting, so SWR keeps polling both.
+// Each commodity domain's full panel set; the page mounts only the active one.
 function DomainPanels({ domain, visible, ontologyMode }: { domain: Domain; visible: boolean; ontologyMode: OntologyMode }) {
   return (
     <div style={{ display: visible ? 'contents' : 'none' }}>
@@ -663,43 +662,43 @@ export default function Dashboard() {
       {/* ── Main grid ── */}
       <div className="main-grid">
         {/*
-          All domain panels are always mounted so SWR polls them independently.
-          `display: contents` passes grid children through; `display: none` hides.
+          Only the active domain's panels are mounted. Mounting all eleven made
+          every hidden tab fetch and poll too: about 240 requests on load, the
+          visible tab's queued behind the rest (30 s), and 200 more every 30 s
+          for data that changes weekly. SWR's cache still shows a tab seen
+          before at once when it is opened again, then refreshes it.
+          `display: contents` passes grid children through.
           MR uses its own panel set; commodity domains share DomainPanels.
           DomainReport is intentionally NOT inside this grid — it lives below in
           .report-section so its natural height contributes to document scroll height
           rather than being capped at the 88px grid-auto-row.
         */}
-        <MrDomainPanels visible={active === 'mr'} ontologyMode={effectiveMode} />
-        <AiDomainPanels visible={active === 'ai'} ontologyMode={effectiveMode} />
+        {active === 'mr' && <MrDomainPanels visible ontologyMode={effectiveMode} />}
+        {active === 'ai' && <AiDomainPanels visible ontologyMode={effectiveMode} />}
         {/* NG uses the generic commodity DomainPanels with full mock support */}
-        <DomainPanels domain="ng" visible={active === 'ng'} ontologyMode={effectiveMode} />
+        {active === 'ng' && <DomainPanels domain="ng" visible ontologyMode={effectiveMode} />}
         {/* New macro domains — no mock fallback, API errors surface visibly */}
-        <SdDomainPanels visible={active === 'sd'} ontologyMode={effectiveMode} />
-        <CcDomainPanels visible={active === 'cc'} ontologyMode={effectiveMode} />
-        <ErDomainPanels visible={active === 'er'} ontologyMode={effectiveMode} />
-        <LmDomainPanels visible={active === 'lm'} ontologyMode={effectiveMode} />
-        <CrDomainPanels visible={active === 'cr'} ontologyMode={effectiveMode} />
-        <GpDomainPanels visible={active === 'gp'} ontologyMode={effectiveMode} />
-        <SfDomainPanels visible={active === 'sf'} ontologyMode={effectiveMode} />
-        <ArtDomainPanels visible={active === 'art'} ontologyMode={effectiveMode} />
+        {active === 'sd' && <SdDomainPanels visible ontologyMode={effectiveMode} />}
+        {active === 'cc' && <CcDomainPanels visible ontologyMode={effectiveMode} />}
+        {active === 'er' && <ErDomainPanels visible ontologyMode={effectiveMode} />}
+        {active === 'lm' && <LmDomainPanels visible ontologyMode={effectiveMode} />}
+        {active === 'cr' && <CrDomainPanels visible ontologyMode={effectiveMode} />}
+        {active === 'gp' && <GpDomainPanels visible ontologyMode={effectiveMode} />}
+        {active === 'sf' && <SfDomainPanels visible ontologyMode={effectiveMode} />}
+        {active === 'art' && <ArtDomainPanels visible ontologyMode={effectiveMode} />}
       </div>
 
       {/*
         ── Domain report section ──
-        All 11 reports stay mounted so SWR caches stay warm on domain switch.
-        Only the active domain's report is visible. Positioned outside the grid
-        so the panel's full height contributes to the document's scrollable area.
+        The active domain's report only, like the panels. Positioned outside the
+        grid so the panel's full height contributes to the document's scrollable area.
       */}
       <div className="report-section">
-        {DOMAINS.map(d => (
-          <div key={d.key} style={{ display: active === d.key ? 'block' : 'none' }}>
-            <DomainReport
-              domain={d.key}
-              ontologyMode={d.key === 'art' ? ontologyMode : 'apriori'}
-            />
-          </div>
-        ))}
+        <DomainReport
+          key={active}
+          domain={active}
+          ontologyMode={active === 'art' ? ontologyMode : 'apriori'}
+        />
       </div>
     </div>
   )
