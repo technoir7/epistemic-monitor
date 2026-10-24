@@ -4,12 +4,6 @@ import { useEffect, useRef } from 'react'
 import useSWR from 'swr'
 import type { Domain, InferenceResponse, QueryRequest, GraphNode, GraphEdge } from '@/lib/types'
 import { fetchInferenceQuery } from '@/lib/api'
-import { MOCK } from '@/lib/mockData'
-
-type MockKey = keyof typeof MOCK
-function mockFor(domain: Domain) {
-  return (MOCK as Record<string, typeof MOCK[MockKey] | undefined>)[domain]
-}
 
 const POLL = 30_000
 
@@ -106,14 +100,10 @@ interface Props {
 }
 
 export default function BeliefGraph({ domain, targetVariable = 'price_up' }: Props) {
-  // Use mock candidate id when available; undefined for domains without mocks
-  // (e.g. 'mr') — the API accepts candidate_id as optional.
-  const dominantId = mockFor(domain)?.status.dominant_hypothesis.candidate_id
-
+  // No candidate_id: the engine then answers for the current dominant one.
   const req: QueryRequest = {
     domain,
     target_variable: targetVariable,
-    candidate_id: dominantId,
     aggregation: 'weighted_avg',
   }
 

@@ -50,7 +50,7 @@ export default function DomainReport({ domain }: Props) {
 
   // Load cached report on mount. No polling — SWR key just fetches once
   // and we manually mutate after a successful refresh.
-  const { data, mutate, isLoading } = useSWR<DomainReportType | DomainReportEmpty>(
+  const { data, error: loadError, mutate, isLoading } = useSWR<DomainReportType | DomainReportEmpty>(
     ['domain-report', domain],
     fetchCachedReport,
     { revalidateOnFocus: false, refreshInterval: 0 },
@@ -118,7 +118,13 @@ export default function DomainReport({ domain }: Props) {
         <div className="report-loading">loading cached report…</div>
       )}
 
-      {!isLoading && !report && !refreshError && (
+      {loadError && !report && (
+        <div className="report-error">
+          API ERROR · {String(loadError.message ?? `/v1/report/${domain} unreachable`)}
+        </div>
+      )}
+
+      {!isLoading && !loadError && !report && !refreshError && (
         <div className="report-empty">
           no report generated yet · click &quot;update report&quot; to generate
         </div>

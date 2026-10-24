@@ -92,20 +92,6 @@ export interface InferenceResponse {
   frontier_edges: FrontierEdge[]
 }
 
-// ─── GET /v1/population/lineage/{id} → ParadigmShiftTimeline ─────────────────
-export interface LineageEvent {
-  generation: number
-  event_type: 'shift' | 'introduce' | 'milestone' | 'current'
-  description: string
-  dominant_after?: string
-}
-
-export interface LineageResponse {
-  domain: string
-  candidate_id: string
-  events: LineageEvent[]
-}
-
 // ─── GET /v1/population/shifts → ParadigmShiftTimeline ──────────────────────
 export interface ShiftEvent {
   shift_id: string
@@ -137,7 +123,7 @@ export interface EvidenceResponse {
   records: EvidenceRecord[]
 }
 
-// ─── GET /v1/evidence/recent?domain=mr → RegimeStatePanel ────────────────────
+// ─── POST /v1/inference/query → RegimeStatePanel (mr) ────────────────────────
 export type MrVariableName =
   | 'YieldCurveInverted'
   | 'InflationShock'
@@ -148,23 +134,7 @@ export type MrVariableName =
   | 'EquityRiskOn'
   | 'AIRiskOn'
 
-export interface MrRegimeVariable {
-  state: boolean
-  probability: number
-}
-
-export interface MrEvidenceRecord {
-  id: string
-  timestamp: string
-  variables: Partial<Record<MrVariableName, MrRegimeVariable>>
-}
-
-export interface MrEvidenceResponse {
-  domain: string
-  records: MrEvidenceRecord[]
-}
-
-// ─── GET /v1/evidence/recent?domain=ai → AiRegimeStatePanel ──────────────────
+// ─── POST /v1/inference/query → AiRegimeStatePanel ──────────────────────────
 export type AiVariableName =
   | 'SemiconductorMomentum'
   | 'MarketConcentrationExtreme'

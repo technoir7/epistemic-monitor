@@ -40,7 +40,7 @@ export default function EpistemicStateBar({ domain }: Props) {
     { refreshInterval: POLL, revalidateOnFocus: false },
   )
 
-  // Visible API error — no silent fallback for domains without mock data
+  // A failed status call shows as an error, never as placeholder numbers
   if (error) {
     return (
       <div className="panel epistemic-state" style={{ padding: 0, gridColumn: '1/3' }}>

@@ -23,7 +23,7 @@ function rowClass(s: EvidenceRecord['strength']): string {
 }
 
 export default function EvidenceStream({ domain }: Props) {
-  const { data } = useSWR<EvidenceResponse>(
+  const { data, error } = useSWR<EvidenceResponse>(
     ['evidence-recent', domain],
     fetchRecentEvidence,
     { refreshInterval: POLL, revalidateOnFocus: false },
@@ -38,8 +38,14 @@ export default function EvidenceStream({ domain }: Props) {
         <div className="tip" style={{ left: 0, transform: 'none' }}>Incoming observations from NOAA and EIA data sources, mapped to domain variables and ingested as evidence records. The impact column shows the net change to the dominant candidate&apos;s log score from that record.</div>
       </div>
       <div className="ev-stream">
-        {records.length === 0 && (
+        {error ? (
+          <div style={{ color: 'var(--red-dim)', fontSize: 10 }}>
+            API ERROR · {String(error.message ?? '/v1/evidence/recent unreachable')}
+          </div>
+        ) : !data ? (
           <div style={{ color: 'var(--text-faint)', fontSize: 10 }}>loading…</div>
+        ) : records.length === 0 && (
+          <div style={{ color: 'var(--text-faint)', fontSize: 10 }}>no evidence yet</div>
         )}
         {records.map((r) => (
           <div key={r.id} className={`ev-row ${rowClass(r.strength)}`}>

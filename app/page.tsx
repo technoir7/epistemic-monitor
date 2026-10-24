@@ -251,7 +251,6 @@ function DomainPanels({ domain, visible }: { domain: Domain; visible: boolean })
 
 // MR (Macro Regime) panel set.
 // Uses the same grid and reuses all existing components where possible.
-// No mock fallback — API errors surface as visible error states.
 function MrDomainPanels({ visible }: { visible: boolean }) {
   return (
     <div style={{ display: visible ? 'contents' : 'none' }}>
@@ -263,8 +262,7 @@ function MrDomainPanels({ visible }: { visible: boolean }) {
       <RegimeStatePanel domain="mr" />
       {/* Col 3, rows 1-4: ontology competition */}
       <OntologyPopulation domain="mr" />
-      {/* Paradigm shift history — uses live dominant candidate_id from
-          GET /v1/population/status?domain=mr; no mock needed */}
+      {/* Paradigm shift history */}
       <ParadigmShiftTimeline domain="mr" />
       <ExplorationFrontier domain="mr" />
       {/* Row 6: terminal prompt line */}
@@ -274,7 +272,7 @@ function MrDomainPanels({ visible }: { visible: boolean }) {
 }
 
 // AI Regime panel set.
-// Same layout as MrDomainPanels. No mock fallback — errors surface visibly.
+// Same layout as MrDomainPanels.
 function AiDomainPanels({ visible }: { visible: boolean }) {
   return (
     <div style={{ display: visible ? 'contents' : 'none' }}>
@@ -295,7 +293,7 @@ function AiDomainPanels({ visible }: { visible: boolean }) {
   )
 }
 
-// Sovereign Debt panel set. No mock fallback — errors surface visibly.
+// Sovereign Debt panel set.
 function SdDomainPanels({ visible }: { visible: boolean }) {
   return (
     <div style={{ display: visible ? 'contents' : 'none' }}>
@@ -310,7 +308,7 @@ function SdDomainPanels({ visible }: { visible: boolean }) {
   )
 }
 
-// Credit Cycle panel set. No mock fallback — errors surface visibly.
+// Credit Cycle panel set.
 function CcDomainPanels({ visible }: { visible: boolean }) {
   return (
     <div style={{ display: visible ? 'contents' : 'none' }}>
@@ -325,7 +323,7 @@ function CcDomainPanels({ visible }: { visible: boolean }) {
   )
 }
 
-// Energy Regime panel set. No mock fallback — errors surface visibly.
+// Energy Regime panel set.
 function ErDomainPanels({ visible }: { visible: boolean }) {
   return (
     <div style={{ display: visible ? 'contents' : 'none' }}>
@@ -340,7 +338,7 @@ function ErDomainPanels({ visible }: { visible: boolean }) {
   )
 }
 
-// Labor Market panel set. No mock fallback — errors surface visibly.
+// Labor Market panel set.
 function LmDomainPanels({ visible }: { visible: boolean }) {
   return (
     <div style={{ display: visible ? 'contents' : 'none' }}>
@@ -355,7 +353,7 @@ function LmDomainPanels({ visible }: { visible: boolean }) {
   )
 }
 
-// Crypto Regime panel set. No mock fallback — errors surface visibly.
+// Crypto Regime panel set.
 function CrDomainPanels({ visible }: { visible: boolean }) {
   return (
     <div style={{ display: visible ? 'contents' : 'none' }}>
@@ -370,7 +368,7 @@ function CrDomainPanels({ visible }: { visible: boolean }) {
   )
 }
 
-// Geopolitics panel set. No mock fallback — errors surface visibly.
+// Geopolitics panel set.
 function GpDomainPanels({ visible }: { visible: boolean }) {
   return (
     <div style={{ display: visible ? 'contents' : 'none' }}>
@@ -385,7 +383,7 @@ function GpDomainPanels({ visible }: { visible: boolean }) {
   )
 }
 
-// SF Urban panel set. No mock fallback — errors surface visibly.
+// SF Urban panel set.
 function SfDomainPanels({ visible }: { visible: boolean }) {
   return (
     <div style={{ display: visible ? 'contents' : 'none' }}>
@@ -400,7 +398,7 @@ function SfDomainPanels({ visible }: { visible: boolean }) {
   )
 }
 
-// Art Regime panel set. No mock fallback — API errors surface visibly.
+// Art Regime panel set.
 function ArtDomainPanels({ visible }: { visible: boolean }) {
   return (
     <div style={{ display: visible ? 'contents' : 'none' }}>
@@ -647,9 +645,9 @@ export default function Dashboard() {
         */}
         {active === 'mr' && <MrDomainPanels visible />}
         {active === 'ai' && <AiDomainPanels visible />}
-        {/* NG uses the generic commodity DomainPanels with full mock support */}
+        {/* NG uses the generic commodity DomainPanels, which adds edge and evidence panels */}
         {active === 'ng' && <DomainPanels domain="ng" visible />}
-        {/* New macro domains — no mock fallback, API errors surface visibly */}
+        {/* Other domains each pair the shared panels with their own regime panel */}
         {active === 'sd' && <SdDomainPanels visible />}
         {active === 'cc' && <CcDomainPanels visible />}
         {active === 'er' && <ErDomainPanels visible />}

@@ -3,7 +3,6 @@
 import useSWR from 'swr'
 import type { Domain, InferenceResponse, QueryRequest } from '@/lib/types'
 import { fetchInferenceQuery } from '@/lib/api'
-import { MOCK } from '@/lib/mockData'
 
 const POLL = 30_000
 
@@ -35,32 +34,36 @@ function badgeColor(status: string) {
 }
 
 export default function EdgeExistencePanel({ domain }: Props) {
-  const dominantId = MOCK[domain as keyof typeof MOCK].status.dominant_hypothesis.candidate_id
+  // Same query as BeliefGraph's default, so SWR shares one request between them.
   const req: QueryRequest = {
     domain,
     target_variable: 'price_up',
-    candidate_id: dominantId,
     aggregation: 'weighted_avg',
   }
 
-  const { data } = useSWR<InferenceResponse>(
+  const { data, error } = useSWR<InferenceResponse>(
     ['inference-query', req],
     fetchInferenceQuery,
     { refreshInterval: POLL, revalidateOnFocus: false },
   )
 
   const edges = data?.edges ?? []
-  const candidateId = data?.candidate_id ?? dominantId
 
   return (
     <div className="panel edge-panel">
       <div className="panel-label has-tip">
-        edge_existence_probabilities · {candidateId}
+        edge_existence_probabilities{data ? ` · ${data.candidate_id}` : ''}
         <div className="tip" style={{ left: 0, transform: 'none' }}>Probability that each relationship actually exists, learned from evidence. Not assumed — the system starts uncertain and updates toward 0 or 1 as evidence accumulates. Near 0.5 means genuinely unresolved.</div>
       </div>
       <div className="edge-list">
-        {edges.length === 0 && (
+        {error ? (
+          <div style={{ color: 'var(--red-dim)', fontSize: 10 }}>
+            API ERROR · {String(error.message ?? '/v1/inference/query unreachable')}
+          </div>
+        ) : !data ? (
           <div style={{ color: 'var(--text-faint)', fontSize: 10 }}>loading…</div>
+        ) : edges.length === 0 && (
+          <div style={{ color: 'var(--text-faint)', fontSize: 10 }}>no edges</div>
         )}
         {edges.map((e, i) => {
           const badge = badgeLabel(e.status)

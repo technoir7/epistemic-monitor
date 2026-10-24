@@ -3,7 +3,6 @@
 import useSWR from 'swr'
 import type { Domain, CandidatesResponse, InferenceResponse, QueryRequest } from '@/lib/types'
 import { fetchCandidates, fetchInferenceQuery } from '@/lib/api'
-import { MOCK } from '@/lib/mockData'
 
 const POLL = 30_000
 
@@ -26,8 +25,6 @@ interface Props {
 }
 
 export default function ExplorationFrontier({ domain }: Props) {
-  const mock = (MOCK as Record<string, typeof MOCK[keyof typeof MOCK] | undefined>)[domain]
-
   const { data: candidatesData } = useSWR<CandidatesResponse>(
     ['candidates', domain],
     fetchCandidates,
@@ -36,8 +33,7 @@ export default function ExplorationFrontier({ domain }: Props) {
 
   const dominantId =
     candidatesData?.candidates.find(c => c.status === 'dominant')?.id ??
-    candidatesData?.candidates[0]?.id ??
-    mock?.status.dominant_hypothesis.candidate_id
+    candidatesData?.candidates[0]?.id
 
   const req: QueryRequest | null = dominantId
     ? {
