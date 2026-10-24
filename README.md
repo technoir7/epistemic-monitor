@@ -1,6 +1,10 @@
 # Epistemic State Monitor
 
-Next.js 14 frontend dashboard for the probabilistic ontology engine.
+Next.js 14 frontend dashboard for the
+[probabilistic ontology engine](https://github.com/technoir7/probabilistic_ontology_engine).
+
+Live: https://epistemic-monitor-production.up.railway.app
+
 Hacker-terminal aesthetic — CRT scanlines, VT323 headers, #00ff41 on #030a03.
 
 ---
