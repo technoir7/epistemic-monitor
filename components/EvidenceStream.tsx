@@ -1,14 +1,13 @@
 'use client'
 
 import useSWR from 'swr'
-import type { Domain, OntologyMode, EvidenceResponse, EvidenceRecord } from '@/lib/types'
+import type { Domain, EvidenceResponse, EvidenceRecord } from '@/lib/types'
 import { fetchRecentEvidence } from '@/lib/api'
 
 const POLL = 30_000
 
 interface Props {
   domain: Domain
-  ontologyMode: OntologyMode
 }
 
 function impactLabel(delta: number): string {
@@ -23,9 +22,9 @@ function rowClass(s: EvidenceRecord['strength']): string {
   return 'ev-weak'
 }
 
-export default function EvidenceStream({ domain, ontologyMode }: Props) {
+export default function EvidenceStream({ domain }: Props) {
   const { data } = useSWR<EvidenceResponse>(
-    ['evidence-recent', domain, ontologyMode],
+    ['evidence-recent', domain],
     fetchRecentEvidence,
     { refreshInterval: POLL, revalidateOnFocus: false },
   )

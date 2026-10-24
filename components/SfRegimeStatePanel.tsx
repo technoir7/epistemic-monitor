@@ -1,7 +1,7 @@
 'use client'
 
 import useSWR from 'swr'
-import type { Domain, OntologyMode, SfVariableName } from '@/lib/types'
+import type { Domain, SfVariableName } from '@/lib/types'
 
 const POLL = 30_000
 const API_BASE =
@@ -37,14 +37,14 @@ interface VariableProbabilityResponse {
 }
 
 async function fetchSfVariableProbabilities(
-  [, domain, mode]: [string, Domain, OntologyMode],
+  [, domain]: [string, Domain],
 ): Promise<SfRegimeProbabilityMap> {
   const entries = await Promise.all(
     VAR_ORDER.map(async name => {
       const res = await fetch(`${API_BASE}/v1/inference/query`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify({ domain, target_variable: name, ontology_mode: mode }),
+        body: JSON.stringify({ domain, target_variable: name }),
       })
 
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
@@ -63,12 +63,11 @@ async function fetchSfVariableProbabilities(
 
 interface Props {
   domain: Domain
-  ontologyMode: OntologyMode
 }
 
-export default function SfRegimeStatePanel({ domain, ontologyMode }: Props) {
+export default function SfRegimeStatePanel({ domain }: Props) {
   const { data, error } = useSWR<SfRegimeProbabilityMap>(
-    ['sf-regime-probabilities', domain, ontologyMode],
+    ['sf-regime-probabilities', domain],
     fetchSfVariableProbabilities,
     { refreshInterval: POLL, revalidateOnFocus: false },
   )

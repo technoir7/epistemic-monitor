@@ -2,12 +2,11 @@
 
 import { useState } from 'react'
 import useSWR from 'swr'
-import type { Domain, OntologyMode, DomainReport as DomainReportType, DomainReportEmpty } from '@/lib/types'
+import type { Domain, DomainReport as DomainReportType, DomainReportEmpty } from '@/lib/types'
 import { fetchCachedReport, refreshReport } from '@/lib/api'
 
 interface Props {
   domain: Domain
-  ontologyMode: OntologyMode
 }
 
 function formatTs(iso: string): string {
@@ -45,14 +44,14 @@ function ReportBody({ text }: { text: string }) {
   )
 }
 
-export default function DomainReport({ domain, ontologyMode }: Props) {
+export default function DomainReport({ domain }: Props) {
   const [refreshing, setRefreshing] = useState(false)
   const [refreshError, setRefreshError] = useState<string | null>(null)
 
   // Load cached report on mount. No polling — SWR key just fetches once
   // and we manually mutate after a successful refresh.
   const { data, mutate, isLoading } = useSWR<DomainReportType | DomainReportEmpty>(
-    ['domain-report', domain, ontologyMode],
+    ['domain-report', domain],
     fetchCachedReport,
     { revalidateOnFocus: false, refreshInterval: 0 },
   )
@@ -64,7 +63,7 @@ export default function DomainReport({ domain, ontologyMode }: Props) {
     setRefreshing(true)
     setRefreshError(null)
     try {
-      const fresh = await refreshReport(domain, ontologyMode)
+      const fresh = await refreshReport(domain)
       // Update SWR cache so the UI reflects the new report immediately.
       await mutate(fresh, { revalidate: false })
     } catch (err) {

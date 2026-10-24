@@ -1,7 +1,7 @@
 'use client'
 
 import useSWR from 'swr'
-import type { Domain, OntologyMode, AiVariableName } from '@/lib/types'
+import type { Domain, AiVariableName } from '@/lib/types'
 
 const POLL = 30_000
 const API_BASE =
@@ -38,14 +38,14 @@ interface VariableProbabilityResponse {
 }
 
 async function fetchAiVariableProbabilities(
-  [, domain, mode]: [string, Domain, OntologyMode],
+  [, domain]: [string, Domain],
 ): Promise<AiRegimeProbabilityMap> {
   const entries = await Promise.all(
     VAR_ORDER.map(async name => {
       const res = await fetch(`${API_BASE}/v1/inference/query`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify({ domain, target_variable: name, ontology_mode: mode }),
+        body: JSON.stringify({ domain, target_variable: name }),
       })
 
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
@@ -64,12 +64,11 @@ async function fetchAiVariableProbabilities(
 
 interface Props {
   domain: Domain
-  ontologyMode: OntologyMode
 }
 
-export default function AiRegimeStatePanel({ domain, ontologyMode }: Props) {
+export default function AiRegimeStatePanel({ domain }: Props) {
   const { data, error } = useSWR<AiRegimeProbabilityMap>(
-    ['ai-regime-probabilities', domain, ontologyMode],
+    ['ai-regime-probabilities', domain],
     fetchAiVariableProbabilities,
     { refreshInterval: POLL, revalidateOnFocus: false },
   )

@@ -1,19 +1,18 @@
 'use client'
 
 import useSWR from 'swr'
-import type { Domain, OntologyMode, ShiftsResponse } from '@/lib/types'
+import type { Domain, ShiftsResponse } from '@/lib/types'
 import { fetchPopulationShifts } from '@/lib/api'
 
 const POLL = 30_000
 
 interface Props {
   domain: Domain
-  ontologyMode: OntologyMode
 }
 
-export default function ParadigmShiftTimeline({ domain, ontologyMode }: Props) {
+export default function ParadigmShiftTimeline({ domain }: Props) {
   const { data, error } = useSWR<ShiftsResponse>(
-    ['population-shifts', domain, ontologyMode],
+    ['population-shifts', domain],
     fetchPopulationShifts,
     { refreshInterval: POLL, revalidateOnFocus: false },
   )

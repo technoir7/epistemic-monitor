@@ -1,7 +1,7 @@
 'use client'
 
 import useSWR from 'swr'
-import type { ArtVariableName, Domain, OntologyMode } from '@/lib/types'
+import type { ArtVariableName, Domain } from '@/lib/types'
 
 const POLL = 30_000
 const API_BASE =
@@ -114,14 +114,14 @@ interface ArtRegimeState {
 }
 
 async function fetchArtVariableProbabilities(
-  [, domain, mode]: [string, Domain, OntologyMode],
+  [, domain]: [string, Domain],
 ): Promise<ArtRegimeState> {
   const results = await Promise.allSettled(
     VAR_ORDER.map(async name => {
       const res = await fetch(`${API_BASE}/v1/inference/query`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify({ domain, target_variable: name, ontology_mode: mode }),
+        body: JSON.stringify({ domain, target_variable: name }),
       })
 
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
@@ -160,26 +160,11 @@ async function fetchArtVariableProbabilities(
 
 interface Props {
   domain: Domain
-  ontologyMode: OntologyMode
 }
 
-export default function ArtRegimeStatePanel({ domain, ontologyMode }: Props) {
-  if (ontologyMode === 'dynamic') {
-    return (
-      <div className="panel regime-panel">
-        <div className="panel-label" style={{ color: 'var(--text-dim)' }}>
-          regime_state · dynamic not available
-        </div>
-        <div style={{ color: 'var(--text-dim)', fontSize: 10, padding: '4px 0' }}>
-          Dynamic mode uses POE-A induced concepts, not apriori art variables.
-          View the export snapshot for dynamic ontology state.
-        </div>
-      </div>
-    )
-  }
-
+export default function ArtRegimeStatePanel({ domain }: Props) {
   const { data, error } = useSWR<ArtRegimeState>(
-    ['art-regime-probabilities', domain, ontologyMode],
+    ['art-regime-probabilities', domain],
     fetchArtVariableProbabilities,
     { refreshInterval: POLL, revalidateOnFocus: false },
   )

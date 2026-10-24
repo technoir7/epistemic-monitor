@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { mutate } from 'swr'
-import type { Domain, OntologyMode } from '@/lib/types'
+import type { Domain } from '@/lib/types'
 import { fetchEntropyDebug, triggerIngest } from '@/lib/api'
 import EpistemicStateBar   from '@/components/EpistemicStateBar'
 import BeliefGraph         from '@/components/BeliefGraph'
@@ -234,16 +234,16 @@ function Clock() {
 }
 
 // Each commodity domain's full panel set; the page mounts only the active one.
-function DomainPanels({ domain, visible, ontologyMode }: { domain: Domain; visible: boolean; ontologyMode: OntologyMode }) {
+function DomainPanels({ domain, visible }: { domain: Domain; visible: boolean }) {
   return (
     <div style={{ display: visible ? 'contents' : 'none' }}>
-      <EpistemicStateBar   domain={domain} ontologyMode={ontologyMode} />
-      <BeliefGraph         domain={domain} ontologyMode={ontologyMode} />
-      <OntologyPopulation  domain={domain} ontologyMode={ontologyMode} />
-      <EdgeExistencePanel  domain={domain} ontologyMode={ontologyMode} />
-      <EvidenceStream      domain={domain} ontologyMode={ontologyMode} />
-      <ParadigmShiftTimeline domain={domain} ontologyMode={ontologyMode} />
-      <ExplorationFrontier domain={domain} ontologyMode={ontologyMode} />
+      <EpistemicStateBar   domain={domain} />
+      <BeliefGraph         domain={domain} />
+      <OntologyPopulation  domain={domain} />
+      <EdgeExistencePanel  domain={domain} />
+      <EvidenceStream      domain={domain} />
+      <ParadigmShiftTimeline domain={domain} />
+      <ExplorationFrontier domain={domain} />
       <PromptLine          domain={domain} />
     </div>
   )
@@ -252,21 +252,21 @@ function DomainPanels({ domain, visible, ontologyMode }: { domain: Domain; visib
 // MR (Macro Regime) panel set.
 // Uses the same grid and reuses all existing components where possible.
 // No mock fallback — API errors surface as visible error states.
-function MrDomainPanels({ visible, ontologyMode }: { visible: boolean; ontologyMode: OntologyMode }) {
+function MrDomainPanels({ visible }: { visible: boolean }) {
   return (
     <div style={{ display: visible ? 'contents' : 'none' }}>
       {/* Row 1 (112px): engine status spanning cols 1-2 */}
-      <EpistemicStateBar domain="mr" ontologyMode={ontologyMode} />
+      <EpistemicStateBar domain="mr" />
       {/* Col 1, rows 2-3: belief graph (8-node, smaller nodes via data-driven sizing) */}
-      <BeliefGraph domain="mr" targetVariable="AIRiskOn" ontologyMode={ontologyMode} />
+      <BeliefGraph domain="mr" targetVariable="AIRiskOn" />
       {/* Col 2, rows 2-3: regime state (8 boolean variables + probabilities) */}
-      <RegimeStatePanel domain="mr" ontologyMode={ontologyMode} />
+      <RegimeStatePanel domain="mr" />
       {/* Col 3, rows 1-4: ontology competition */}
-      <OntologyPopulation domain="mr" ontologyMode={ontologyMode} />
+      <OntologyPopulation domain="mr" />
       {/* Paradigm shift history — uses live dominant candidate_id from
           GET /v1/population/status?domain=mr; no mock needed */}
-      <ParadigmShiftTimeline domain="mr" ontologyMode={ontologyMode} />
-      <ExplorationFrontier domain="mr" ontologyMode={ontologyMode} />
+      <ParadigmShiftTimeline domain="mr" />
+      <ExplorationFrontier domain="mr" />
       {/* Row 6: terminal prompt line */}
       <PromptLine domain="mr" />
     </div>
@@ -275,20 +275,20 @@ function MrDomainPanels({ visible, ontologyMode }: { visible: boolean; ontologyM
 
 // AI Regime panel set.
 // Same layout as MrDomainPanels. No mock fallback — errors surface visibly.
-function AiDomainPanels({ visible, ontologyMode }: { visible: boolean; ontologyMode: OntologyMode }) {
+function AiDomainPanels({ visible }: { visible: boolean }) {
   return (
     <div style={{ display: visible ? 'contents' : 'none' }}>
       {/* Row 1 (112px): engine status spanning cols 1-2 */}
-      <EpistemicStateBar domain="ai" ontologyMode={ontologyMode} />
+      <EpistemicStateBar domain="ai" />
       {/* Col 1, rows 2-3: belief graph targeting SemiconductorMomentum */}
-      <BeliefGraph domain="ai" targetVariable="SemiconductorMomentum" ontologyMode={ontologyMode} />
+      <BeliefGraph domain="ai" targetVariable="SemiconductorMomentum" />
       {/* Col 2, rows 2-3: regime state (8 AI boolean variables + probabilities) */}
-      <AiRegimeStatePanel domain="ai" ontologyMode={ontologyMode} />
+      <AiRegimeStatePanel domain="ai" />
       {/* Col 3, rows 1-4: ontology competition */}
-      <OntologyPopulation domain="ai" ontologyMode={ontologyMode} />
+      <OntologyPopulation domain="ai" />
       {/* Paradigm shift history */}
-      <ParadigmShiftTimeline domain="ai" ontologyMode={ontologyMode} />
-      <ExplorationFrontier domain="ai" ontologyMode={ontologyMode} />
+      <ParadigmShiftTimeline domain="ai" />
+      <ExplorationFrontier domain="ai" />
       {/* Row: terminal prompt line */}
       <PromptLine domain="ai" />
     </div>
@@ -296,120 +296,120 @@ function AiDomainPanels({ visible, ontologyMode }: { visible: boolean; ontologyM
 }
 
 // Sovereign Debt panel set. No mock fallback — errors surface visibly.
-function SdDomainPanels({ visible, ontologyMode }: { visible: boolean; ontologyMode: OntologyMode }) {
+function SdDomainPanels({ visible }: { visible: boolean }) {
   return (
     <div style={{ display: visible ? 'contents' : 'none' }}>
-      <EpistemicStateBar domain="sd" ontologyMode={ontologyMode} />
-      <BeliefGraph domain="sd" targetVariable="USYieldSpiking" ontologyMode={ontologyMode} />
-      <SdRegimeStatePanel domain="sd" ontologyMode={ontologyMode} />
-      <OntologyPopulation domain="sd" ontologyMode={ontologyMode} />
-      <ParadigmShiftTimeline domain="sd" ontologyMode={ontologyMode} />
-      <ExplorationFrontier domain="sd" ontologyMode={ontologyMode} />
+      <EpistemicStateBar domain="sd" />
+      <BeliefGraph domain="sd" targetVariable="USYieldSpiking" />
+      <SdRegimeStatePanel domain="sd" />
+      <OntologyPopulation domain="sd" />
+      <ParadigmShiftTimeline domain="sd" />
+      <ExplorationFrontier domain="sd" />
       <PromptLine domain="sd" />
     </div>
   )
 }
 
 // Credit Cycle panel set. No mock fallback — errors surface visibly.
-function CcDomainPanels({ visible, ontologyMode }: { visible: boolean; ontologyMode: OntologyMode }) {
+function CcDomainPanels({ visible }: { visible: boolean }) {
   return (
     <div style={{ display: visible ? 'contents' : 'none' }}>
-      <EpistemicStateBar domain="cc" ontologyMode={ontologyMode} />
-      <BeliefGraph domain="cc" targetVariable="HYSpreadElevated" ontologyMode={ontologyMode} />
-      <CcRegimeStatePanel domain="cc" ontologyMode={ontologyMode} />
-      <OntologyPopulation domain="cc" ontologyMode={ontologyMode} />
-      <ParadigmShiftTimeline domain="cc" ontologyMode={ontologyMode} />
-      <ExplorationFrontier domain="cc" ontologyMode={ontologyMode} />
+      <EpistemicStateBar domain="cc" />
+      <BeliefGraph domain="cc" targetVariable="HYSpreadElevated" />
+      <CcRegimeStatePanel domain="cc" />
+      <OntologyPopulation domain="cc" />
+      <ParadigmShiftTimeline domain="cc" />
+      <ExplorationFrontier domain="cc" />
       <PromptLine domain="cc" />
     </div>
   )
 }
 
 // Energy Regime panel set. No mock fallback — errors surface visibly.
-function ErDomainPanels({ visible, ontologyMode }: { visible: boolean; ontologyMode: OntologyMode }) {
+function ErDomainPanels({ visible }: { visible: boolean }) {
   return (
     <div style={{ display: visible ? 'contents' : 'none' }}>
-      <EpistemicStateBar domain="er" ontologyMode={ontologyMode} />
-      <BeliefGraph domain="er" targetVariable="OilPriceSurge" ontologyMode={ontologyMode} />
-      <ErRegimeStatePanel domain="er" ontologyMode={ontologyMode} />
-      <OntologyPopulation domain="er" ontologyMode={ontologyMode} />
-      <ParadigmShiftTimeline domain="er" ontologyMode={ontologyMode} />
-      <ExplorationFrontier domain="er" ontologyMode={ontologyMode} />
+      <EpistemicStateBar domain="er" />
+      <BeliefGraph domain="er" targetVariable="OilPriceSurge" />
+      <ErRegimeStatePanel domain="er" />
+      <OntologyPopulation domain="er" />
+      <ParadigmShiftTimeline domain="er" />
+      <ExplorationFrontier domain="er" />
       <PromptLine domain="er" />
     </div>
   )
 }
 
 // Labor Market panel set. No mock fallback — errors surface visibly.
-function LmDomainPanels({ visible, ontologyMode }: { visible: boolean; ontologyMode: OntologyMode }) {
+function LmDomainPanels({ visible }: { visible: boolean }) {
   return (
     <div style={{ display: visible ? 'contents' : 'none' }}>
-      <EpistemicStateBar domain="lm" ontologyMode={ontologyMode} />
-      <BeliefGraph domain="lm" targetVariable="UnemploymentRising" ontologyMode={ontologyMode} />
-      <LmRegimeStatePanel domain="lm" ontologyMode={ontologyMode} />
-      <OntologyPopulation domain="lm" ontologyMode={ontologyMode} />
-      <ParadigmShiftTimeline domain="lm" ontologyMode={ontologyMode} />
-      <ExplorationFrontier domain="lm" ontologyMode={ontologyMode} />
+      <EpistemicStateBar domain="lm" />
+      <BeliefGraph domain="lm" targetVariable="UnemploymentRising" />
+      <LmRegimeStatePanel domain="lm" />
+      <OntologyPopulation domain="lm" />
+      <ParadigmShiftTimeline domain="lm" />
+      <ExplorationFrontier domain="lm" />
       <PromptLine domain="lm" />
     </div>
   )
 }
 
 // Crypto Regime panel set. No mock fallback — errors surface visibly.
-function CrDomainPanels({ visible, ontologyMode }: { visible: boolean; ontologyMode: OntologyMode }) {
+function CrDomainPanels({ visible }: { visible: boolean }) {
   return (
     <div style={{ display: visible ? 'contents' : 'none' }}>
-      <EpistemicStateBar domain="cr" ontologyMode={ontologyMode} />
-      <BeliefGraph domain="cr" targetVariable="BTCMomentumPositive" ontologyMode={ontologyMode} />
-      <CrRegimeStatePanel domain="cr" ontologyMode={ontologyMode} />
-      <OntologyPopulation domain="cr" ontologyMode={ontologyMode} />
-      <ParadigmShiftTimeline domain="cr" ontologyMode={ontologyMode} />
-      <ExplorationFrontier domain="cr" ontologyMode={ontologyMode} />
+      <EpistemicStateBar domain="cr" />
+      <BeliefGraph domain="cr" targetVariable="BTCMomentumPositive" />
+      <CrRegimeStatePanel domain="cr" />
+      <OntologyPopulation domain="cr" />
+      <ParadigmShiftTimeline domain="cr" />
+      <ExplorationFrontier domain="cr" />
       <PromptLine domain="cr" />
     </div>
   )
 }
 
 // Geopolitics panel set. No mock fallback — errors surface visibly.
-function GpDomainPanels({ visible, ontologyMode }: { visible: boolean; ontologyMode: OntologyMode }) {
+function GpDomainPanels({ visible }: { visible: boolean }) {
   return (
     <div style={{ display: visible ? 'contents' : 'none' }}>
-      <EpistemicStateBar domain="gp" ontologyMode={ontologyMode} />
-      <BeliefGraph domain="gp" targetVariable="ConflictIntensityElevated" ontologyMode={ontologyMode} />
-      <GpRegimeStatePanel domain="gp" ontologyMode={ontologyMode} />
-      <OntologyPopulation domain="gp" ontologyMode={ontologyMode} />
-      <ParadigmShiftTimeline domain="gp" ontologyMode={ontologyMode} />
-      <ExplorationFrontier domain="gp" ontologyMode={ontologyMode} />
+      <EpistemicStateBar domain="gp" />
+      <BeliefGraph domain="gp" targetVariable="ConflictIntensityElevated" />
+      <GpRegimeStatePanel domain="gp" />
+      <OntologyPopulation domain="gp" />
+      <ParadigmShiftTimeline domain="gp" />
+      <ExplorationFrontier domain="gp" />
       <PromptLine domain="gp" />
     </div>
   )
 }
 
 // SF Urban panel set. No mock fallback — errors surface visibly.
-function SfDomainPanels({ visible, ontologyMode }: { visible: boolean; ontologyMode: OntologyMode }) {
+function SfDomainPanels({ visible }: { visible: boolean }) {
   return (
     <div style={{ display: visible ? 'contents' : 'none' }}>
-      <EpistemicStateBar domain="sf" ontologyMode={ontologyMode} />
-      <BeliefGraph domain="sf" targetVariable="TechHiringAccelerating" ontologyMode={ontologyMode} />
-      <SfRegimeStatePanel domain="sf" ontologyMode={ontologyMode} />
-      <OntologyPopulation domain="sf" ontologyMode={ontologyMode} />
-      <ParadigmShiftTimeline domain="sf" ontologyMode={ontologyMode} />
-      <ExplorationFrontier domain="sf" ontologyMode={ontologyMode} />
+      <EpistemicStateBar domain="sf" />
+      <BeliefGraph domain="sf" targetVariable="TechHiringAccelerating" />
+      <SfRegimeStatePanel domain="sf" />
+      <OntologyPopulation domain="sf" />
+      <ParadigmShiftTimeline domain="sf" />
+      <ExplorationFrontier domain="sf" />
       <PromptLine domain="sf" />
     </div>
   )
 }
 
 // Art Regime panel set. No mock fallback — API errors surface visibly.
-function ArtDomainPanels({ visible, ontologyMode }: { visible: boolean; ontologyMode: OntologyMode }) {
+function ArtDomainPanels({ visible }: { visible: boolean }) {
   return (
     <div style={{ display: visible ? 'contents' : 'none' }}>
-      <EpistemicStateBar domain="art" ontologyMode={ontologyMode} />
-      <BeliefGraph domain="art" targetVariable="CraftPrestigeRising" ontologyMode={ontologyMode} />
-      <ArtRegimeStatePanel domain="art" ontologyMode={ontologyMode} />
-      <OntologyPopulation domain="art" ontologyMode={ontologyMode} />
-      <ParadigmShiftTimeline domain="art" ontologyMode={ontologyMode} />
-      <ExplorationFrontier domain="art" ontologyMode={ontologyMode} />
+      <EpistemicStateBar domain="art" />
+      <BeliefGraph domain="art" targetVariable="CraftPrestigeRising" />
+      <ArtRegimeStatePanel domain="art" />
+      <OntologyPopulation domain="art" />
+      <ParadigmShiftTimeline domain="art" />
+      <ExplorationFrontier domain="art" />
       <PromptLine domain="art" />
     </div>
   )
@@ -430,8 +430,6 @@ function isActiveDomainPanelKey(key: unknown, domain: Domain): boolean {
 
 export default function Dashboard() {
   const [active, setActive] = useState<Domain>('mr')
-  const [ontologyMode, setOntologyMode] = useState<OntologyMode>('dynamic')
-  const effectiveMode: OntologyMode = active === 'art' ? ontologyMode : 'apriori'
   const [explainOpen, setExplainOpen] = useState(false)
   const [fetchState, setFetchState] = useState<FetchState>('idle')
   const [exportState, setExportState] = useState<ExportState>('idle')
@@ -479,7 +477,7 @@ export default function Dashboard() {
     setExportState('exporting')
 
     try {
-      const res = await fetch(`${API_BASE}/v1/export/narrative-snapshot?domain=${domain}&ontology_mode=${effectiveMode}`, {
+      const res = await fetch(`${API_BASE}/v1/export/narrative-snapshot?domain=${domain}`, {
         headers: { Accept: 'application/json' },
       })
 
@@ -615,32 +613,6 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* ── Ontology mode toggle — art domain only ── */}
-      {active === 'art' && (
-        <div className="mode-tabs">
-          <span className="mode-tabs-label">ontology_mode :</span>
-          <div
-            className={`mode-tab ${ontologyMode === 'dynamic' ? 'active' : ''}`}
-            onClick={() => setOntologyMode('dynamic')}
-          >
-            <span className="tab-ticker">DY</span>
-            Dynamic Concepts
-          </div>
-          <div
-            className={`mode-tab ${ontologyMode === 'apriori' ? 'active' : ''}`}
-            onClick={() => setOntologyMode('apriori')}
-          >
-            <span className="tab-ticker">AP</span>
-            A Priori Concepts
-          </div>
-          {process.env.NODE_ENV === 'development' && (
-            <span style={{ marginLeft: 'auto', fontSize: 10, fontFamily: 'var(--font-mono)', color: 'var(--text-dim)', opacity: 0.6, userSelect: 'none' }}>
-              dbg: domain={active} mode={ontologyMode}
-            </span>
-          )}
-        </div>
-      )}
-
       {/* ── Domain tabs ── */}
       <div className="domain-tabs">
         {DOMAINS.map(d => (
@@ -673,19 +645,19 @@ export default function Dashboard() {
           .report-section so its natural height contributes to document scroll height
           rather than being capped at the 88px grid-auto-row.
         */}
-        {active === 'mr' && <MrDomainPanels visible ontologyMode={effectiveMode} />}
-        {active === 'ai' && <AiDomainPanels visible ontologyMode={effectiveMode} />}
+        {active === 'mr' && <MrDomainPanels visible />}
+        {active === 'ai' && <AiDomainPanels visible />}
         {/* NG uses the generic commodity DomainPanels with full mock support */}
-        {active === 'ng' && <DomainPanels domain="ng" visible ontologyMode={effectiveMode} />}
+        {active === 'ng' && <DomainPanels domain="ng" visible />}
         {/* New macro domains — no mock fallback, API errors surface visibly */}
-        {active === 'sd' && <SdDomainPanels visible ontologyMode={effectiveMode} />}
-        {active === 'cc' && <CcDomainPanels visible ontologyMode={effectiveMode} />}
-        {active === 'er' && <ErDomainPanels visible ontologyMode={effectiveMode} />}
-        {active === 'lm' && <LmDomainPanels visible ontologyMode={effectiveMode} />}
-        {active === 'cr' && <CrDomainPanels visible ontologyMode={effectiveMode} />}
-        {active === 'gp' && <GpDomainPanels visible ontologyMode={effectiveMode} />}
-        {active === 'sf' && <SfDomainPanels visible ontologyMode={effectiveMode} />}
-        {active === 'art' && <ArtDomainPanels visible ontologyMode={effectiveMode} />}
+        {active === 'sd' && <SdDomainPanels visible />}
+        {active === 'cc' && <CcDomainPanels visible />}
+        {active === 'er' && <ErDomainPanels visible />}
+        {active === 'lm' && <LmDomainPanels visible />}
+        {active === 'cr' && <CrDomainPanels visible />}
+        {active === 'gp' && <GpDomainPanels visible />}
+        {active === 'sf' && <SfDomainPanels visible />}
+        {active === 'art' && <ArtDomainPanels visible />}
       </div>
 
       {/*
@@ -697,7 +669,6 @@ export default function Dashboard() {
         <DomainReport
           key={active}
           domain={active}
-          ontologyMode={active === 'art' ? ontologyMode : 'apriori'}
         />
       </div>
     </div>

@@ -12,8 +12,6 @@ export type Domain =
   | 'sf'
   | 'art'
 
-export type OntologyMode = 'dynamic' | 'apriori'
-
 // ─── GET /v1/population/status → EpistemicStateBar ───────────────────────────
 export interface PopulationStatus {
   domain: string
@@ -58,7 +56,6 @@ export interface QueryRequest {
   candidate_id?: string
   conditions?: Record<string, unknown>
   aggregation?: 'weighted_avg' | 'map' | 'marginal'
-  ontology_mode?: OntologyMode
 }
 
 export interface GraphNode {
@@ -317,7 +314,6 @@ export interface EntropyDebugResponse {
 export interface DomainReport {
   found: true
   domain: string
-  ontology_mode: string
   generated_at: string
   snapshot_hash: string
   report: string
@@ -329,6 +325,5 @@ export interface DomainReport {
 export interface DomainReportEmpty {
   found: false
   domain: string
-  ontology_mode: string
 }
 

@@ -1,6 +1,5 @@
 import type {
   Domain,
-  OntologyMode,
   PopulationStatus,
   CandidatesResponse,
   QueryRequest,
@@ -81,21 +80,21 @@ export async function triggerIngest(domain: Domain): Promise<void> {
 }
 
 export async function fetchPopulationStatus(
-  [, domain, mode]: [string, Domain, OntologyMode],
+  [, domain]: [string, Domain],
 ): Promise<PopulationStatus> {
   const m = mockFor(domain)
   return m
-    ? get(`/v1/population/status?domain=${domain}&ontology_mode=${mode}`, m.status)
-    : getRequired(`/v1/population/status?domain=${domain}&ontology_mode=${mode}`)
+    ? get(`/v1/population/status?domain=${domain}`, m.status)
+    : getRequired(`/v1/population/status?domain=${domain}`)
 }
 
 export async function fetchCandidates(
-  [, domain, mode]: [string, Domain, OntologyMode],
+  [, domain]: [string, Domain],
 ): Promise<CandidatesResponse> {
   const m = mockFor(domain)
   return m
-    ? get(`/v1/population/candidates?domain=${domain}&ontology_mode=${mode}`, m.candidates)
-    : getRequired(`/v1/population/candidates?domain=${domain}&ontology_mode=${mode}`)
+    ? get(`/v1/population/candidates?domain=${domain}`, m.candidates)
+    : getRequired(`/v1/population/candidates?domain=${domain}`)
 }
 
 export async function fetchInferenceQuery(
@@ -116,34 +115,34 @@ export async function fetchInferenceQuery(
 }
 
 export async function fetchLineage(
-  [, domain, candidateId, mode]: [string, Domain, string, OntologyMode],
+  [, domain, candidateId]: [string, Domain, string],
 ): Promise<LineageResponse> {
   const m = mockFor(domain)
   return m
-    ? get(`/v1/population/lineage/${encodeURIComponent(candidateId)}?domain=${domain}&ontology_mode=${mode}`, m.lineage)
-    : getRequired(`/v1/population/lineage/${encodeURIComponent(candidateId)}?domain=${domain}&ontology_mode=${mode}`)
+    ? get(`/v1/population/lineage/${encodeURIComponent(candidateId)}?domain=${domain}`, m.lineage)
+    : getRequired(`/v1/population/lineage/${encodeURIComponent(candidateId)}?domain=${domain}`)
 }
 
 export async function fetchPopulationShifts(
-  [, domain, mode]: [string, Domain, OntologyMode],
+  [, domain]: [string, Domain],
 ): Promise<ShiftsResponse> {
-  return getRequired(`/v1/population/shifts?domain=${encodeURIComponent(domain)}&ontology_mode=${mode}`)
+  return getRequired(`/v1/population/shifts?domain=${encodeURIComponent(domain)}`)
 }
 
 export async function fetchRecentEvidence(
-  [, domain, mode]: [string, Domain, OntologyMode],
+  [, domain]: [string, Domain],
 ): Promise<EvidenceResponse> {
   const m = mockFor(domain)
   return m
-    ? get(`/v1/evidence/recent?domain=${domain}&ontology_mode=${mode}`, m.evidence)
-    : getRequired(`/v1/evidence/recent?domain=${domain}&ontology_mode=${mode}`)
+    ? get(`/v1/evidence/recent?domain=${domain}`, m.evidence)
+    : getRequired(`/v1/evidence/recent?domain=${domain}`)
 }
 
 // ─── MR-specific: regime state (no mock — errors surface visibly) ─────────────
 export async function fetchMrRegimeState(
-  [, domain, mode]: [string, Domain, OntologyMode],
+  [, domain]: [string, Domain],
 ): Promise<MrEvidenceResponse> {
-  return getRequired(`/v1/evidence/recent?domain=${domain}&ontology_mode=${mode}`)
+  return getRequired(`/v1/evidence/recent?domain=${domain}`)
 }
 
 export async function fetchEntropyDebug(domain: Domain): Promise<EntropyDebugResponse> {
@@ -153,21 +152,20 @@ export async function fetchEntropyDebug(domain: Domain): Promise<EntropyDebugRes
 // ─── Report endpoints ─────────────────────────────────────────────────────────
 
 export async function fetchCachedReport(
-  [, domain, mode]: [string, Domain, OntologyMode],
+  [, domain]: [string, Domain],
 ): Promise<DomainReport | DomainReportEmpty> {
   // Never throws — returns {found: false} when no cached report exists.
   return get(
-    `/v1/report/${encodeURIComponent(domain)}?ontology_mode=${mode}`,
-    { found: false, domain, ontology_mode: mode } as DomainReportEmpty,
+    `/v1/report/${encodeURIComponent(domain)}`,
+    { found: false, domain } as DomainReportEmpty,
   )
 }
 
 export async function refreshReport(
   domain: Domain,
-  mode: OntologyMode,
 ): Promise<DomainReport> {
   const res = await fetch(
-    `${API_BASE}/v1/report/${encodeURIComponent(domain)}/refresh?ontology_mode=${mode}`,
+    `${API_BASE}/v1/report/${encodeURIComponent(domain)}/refresh`,
     { method: 'POST', headers: { Accept: 'application/json' } },
   )
   if (!res.ok) {

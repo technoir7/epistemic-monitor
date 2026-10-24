@@ -1,7 +1,7 @@
 'use client'
 
 import useSWR from 'swr'
-import type { Domain, OntologyMode, SdVariableName } from '@/lib/types'
+import type { Domain, SdVariableName } from '@/lib/types'
 
 const POLL = 30_000
 const API_BASE =
@@ -37,14 +37,14 @@ interface VariableProbabilityResponse {
 }
 
 async function fetchSdVariableProbabilities(
-  [, domain, mode]: [string, Domain, OntologyMode],
+  [, domain]: [string, Domain],
 ): Promise<SdRegimeProbabilityMap> {
   const entries = await Promise.all(
     VAR_ORDER.map(async name => {
       const res = await fetch(`${API_BASE}/v1/inference/query`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify({ domain, target_variable: name, ontology_mode: mode }),
+        body: JSON.stringify({ domain, target_variable: name }),
       })
 
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
@@ -63,12 +63,11 @@ async function fetchSdVariableProbabilities(
 
 interface Props {
   domain: Domain
-  ontologyMode: OntologyMode
 }
 
-export default function SdRegimeStatePanel({ domain, ontologyMode }: Props) {
+export default function SdRegimeStatePanel({ domain }: Props) {
   const { data, error } = useSWR<SdRegimeProbabilityMap>(
-    ['sd-regime-probabilities', domain, ontologyMode],
+    ['sd-regime-probabilities', domain],
     fetchSdVariableProbabilities,
     { refreshInterval: POLL, revalidateOnFocus: false },
   )
