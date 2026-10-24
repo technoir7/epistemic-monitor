@@ -1,110 +1,73 @@
 # Epistemic State Monitor
 
-Next.js 14 frontend dashboard for the
-[probabilistic ontology engine](https://github.com/technoir7/probabilistic_ontology_engine).
+A live dashboard for the
+[Probabilistic Ontology Engine](https://github.com/technoir7/probabilistic_ontology_engine),
+a system that keeps several rival explanations of a domain (the macro economy,
+credit, energy, crypto and eight others), scores each against public data as it
+arrives week by week, and changes which one it believes when the evidence says
+to. This dashboard shows that state of belief: which explanation leads, how sure
+the engine is, what it is still unsure about, and when it changed its mind.
 
-Live: https://epistemic-monitor-production.up.railway.app
+**Live:** https://epistemic-monitor-production.up.railway.app
 
-Hacker-terminal aesthetic — CRT scanlines, VT323 headers, #00ff41 on #030a03.
+![The macro domain: status bar, belief graph, regime variables, competing hypotheses and shift history](docs/dashboard.png)
 
----
+## What the panels show
 
-## Local development
+- **Status bar** — how evenly belief is spread across the rival explanations
+  (structure entropy), how many are competing, which one leads and for how
+  long, how often the leader has changed, and how many links are unresolved.
+- **Belief graph** — the leading explanation drawn as cause-and-effect links
+  between signals. Each arrow carries the probability that the link is real;
+  amber dashed links are ones the engine is still testing. "X t-1" means
+  last week's value of X.
+- **Regime state** — the engine's current probability for each signal in the
+  domain (is the yield curve inverted, is credit stressed, …).
+- **Ontology population** — every competing explanation, best first. Variants
+  are named by the one link they add (+) or remove (−) from their parent.
+  The number shown is total fit over all evidence; the order uses recent fit
+  minus a penalty for complexity.
+- **Paradigm shift history** — each time the leader changed, dated by the
+  evidence that caused it. Gold marks a change of worldview (a different family
+  of explanation took over); a dim mark is a revision within one.
+- **Exploration frontier** — links whose probability is near 0.5, which the
+  engine is actively gathering evidence on.
+- **Report** — a cached plain-English reading of the current state, written by
+  an LLM and regenerated only on request.
 
-### Prerequisites
-- Node 20+
-- npm 10+
-- (Optional) A running instance of `probabilistic-ontology-engine` at port 8000
+Natural gas, the first domain, also shows per-edge probabilities and the raw
+evidence feed.
 
-### Setup
+## Stack
+
+Next.js 14 (app router) · TypeScript · SWR (polls every 30 s) · D3 force layout
+for the graph · hand-written CSS. Only the selected domain's panels are mounted,
+so the page polls one domain at a time. When the engine cannot be reached, each
+panel says so; nothing falls back to placeholder data.
+
+## Run locally
+
+Needs Node 18.17+ to run, and 22.18+ for `npm test` (it uses Node's built-in TypeScript support).
 
 ```bash
-git clone <this-repo>
+git clone https://github.com/technoir7/epistemic-monitor.git
 cd epistemic-monitor
-
 npm install
-
-# Copy the env template and edit if needed
 cp .env.local.example .env.local
-# NEXT_PUBLIC_API_BASE_URL defaults to http://localhost:8000 if unset
-
-npm run dev
-# → http://localhost:3000
 ```
 
-If the backend is not running the dashboard still works — every endpoint falls
-back to realistic mock data automatically (see `MISSING_ENDPOINTS.md`).
+Set `NEXT_PUBLIC_API_BASE_URL` in `.env.local` to an engine: the live one at
+`https://epistemic-monitor-suite-production.up.railway.app`, or
+`http://localhost:8000` (the default) if you run the engine yourself. Then:
 
-### Environment variables
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `NEXT_PUBLIC_API_BASE_URL` | `http://localhost:8000` | Base URL of the POE backend |
-
----
-
-## Architecture
-
-```
-app/
-  layout.tsx          Root layout — loads VT323 + Share Tech Mono fonts
-  globals.css         Full design token set + component CSS (ported from HTML reference)
-  page.tsx            Dashboard page — domain switcher, always-on dual polling
-
-components/
-  EpistemicStateBar.tsx     5-metric status row — GET /v1/population/status
-  BeliefGraph.tsx           D3 force-directed belief graph — POST /v1/inference/query
-  OntologyPopulation.tsx    Candidate list with bars — GET /v1/population/candidates
-  EdgeExistencePanel.tsx    Edge probability bars — POST /v1/inference/query
-  EvidenceStream.tsx        Scrolling evidence feed — GET /v1/evidence/recent
-  ParadigmShiftTimeline.tsx Horizontal shift history — GET /v1/population/lineage/{id}
-  ExplorationFrontier.tsx   Unresolved edge chips — POST /v1/inference/query
-  PromptLine.tsx            Bottom prompt decoration
-
-lib/
-  types.ts     TypeScript interfaces for all API shapes
-  api.ts       SWR-compatible fetchers with mock fallback
-  mockData.ts  Realistic NG + ZC mock data
+```bash
+npm run dev        # http://localhost:3000
 ```
 
-### Polling
+Checks: `npx tsc --noEmit`, `npm run lint`, `npm test`, `npm run build`.
 
-All components use SWR with `refreshInterval: 30_000` (30 s).
+## Deployment
 
-Both domain panels (NG, ZC) are **always mounted** — they use
-`display: contents` / `display: none` to toggle visibility.
-This means SWR polls both tabs in the background simultaneously,
-preserving independent polling state when you switch tabs.
-
----
-
-## Deploy to Vercel
-
-1. Push this repo to GitHub/GitLab.
-2. Import the repo in [vercel.com/new](https://vercel.com/new).
-3. Set the environment variable in the Vercel dashboard:
-   ```
-   NEXT_PUBLIC_API_BASE_URL = https://your-poe-backend.railway.app
-   ```
-4. Deploy. Vercel auto-detects Next.js 14 — no build config needed.
-
-### Notes for the Railway backend
-
-- The POE backend should accept CORS from the Vercel domain.
-- The `NEXT_PUBLIC_API_BASE_URL` must be set **before** the Vercel build runs,
-  as it is inlined at build time (`NEXT_PUBLIC_*` prefix).
-
----
-
-## Design tokens
-
-| Token | Value |
-|-------|-------|
-| Background | `#030a03` |
-| Primary green | `#00ff41` |
-| Dim green | `#00882a` |
-| Header font | VT323 |
-| Body/data font | Share Tech Mono |
-| CRT scanlines | `repeating-linear-gradient` overlay, z-index 999 |
-| Prompt line | fixed at bottom of main grid |
-# epistemic-monitor
+Hosted on Railway, which builds and deploys `main` automatically
+(`railway.toml`). `NEXT_PUBLIC_API_BASE_URL` is inlined at build time, so it
+must be set in the Railway service before the build runs.
