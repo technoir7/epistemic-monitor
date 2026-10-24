@@ -10,9 +10,6 @@ node_modules/
 .env.local
 .env.*.local
 
-# Vercel
-.vercel
-
 # Editor
 .vscode/
 .idea/
@@ -22,3 +19,6 @@ node_modules/
 # OS
 .DS_Store
 Thumbs.db
+
+# Local tooling output
+.playwright-mcp/

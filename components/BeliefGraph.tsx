@@ -34,7 +34,7 @@ interface SimLink {
   status: string
 }
 
-// ── Colours matching the HTML reference ─────────────────────────────────────
+// ── Colours (SVG attributes cannot read the CSS tokens in globals.css) ────────
 
 const C = {
   green:       '#00ff41',
