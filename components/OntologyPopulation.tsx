@@ -76,7 +76,7 @@ export default function OntologyPopulation({ domain }: Props) {
     <div className="panel population-panel">
       <div className="panel-label has-tip">
         ontology_population · gen {gen}
-        <div className="tip" style={{ left: 0, transform: 'none' }}>Competing belief structures scored against evidence. Each candidate is a complete hypothesis about how this domain works. The dominant candidate is the system&apos;s current best worldview. Low-scoring candidates are pruned; variants of survivors are introduced each generation.</div>
+        <div className="tip" style={{ left: 0, transform: 'none' }}>Competing belief structures scored against evidence. Each candidate is a complete hypothesis about how this domain works. The dominant candidate is the system&apos;s current best worldview. The engine starts with none and forms them from the evidence: each generation adds the connection the evidence most prompts, and blind variants of survivors. Low-scoring candidates are pruned.</div>
       </div>
       <div className="population-note">
         log_score = total fit over all evidence. Rank = recent fit, minus a

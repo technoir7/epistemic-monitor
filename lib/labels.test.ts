@@ -17,15 +17,20 @@ test('hypothesisLabel turns variant names into the edge they change', () => {
   assert.equal(hypothesisLabel('variant_remove_A->B'), '− A → B')
 })
 
-test('hypothesisLabel leaves seed hypotheses alone', () => {
-  const seed = 'T_persistence: each signal follows its own last week'
-  assert.equal(hypothesisLabel(seed), seed)
-  assert.equal(hypothesisLabel('T*: demand-chain'), 'T*: demand-chain')
+test('hypothesisLabel turns evidence-prompted changes into the edge they change', () => {
+  assert.equal(hypothesisLabel('prompted_add_InflationShock_prev->InflationShock'), '+ InflationShock t-1 → InflationShock')
+  assert.equal(hypothesisLabel('prompted_reverse_A->C'), '⇄ A → C')
 })
 
-test('hypothesisShortLabel drops a seed description but keeps variants whole', () => {
-  assert.equal(hypothesisShortLabel('T_persistence: each signal follows its own last week'), 'T_persistence')
+test('hypothesisLabel leaves the starting structure alone', () => {
+  const start = 'unconnected: no hypotheses yet'
+  assert.equal(hypothesisLabel(start), start)
+})
+
+test('hypothesisShortLabel drops a description but keeps changes whole', () => {
+  assert.equal(hypothesisShortLabel('unconnected: no hypotheses yet'), 'unconnected')
   assert.equal(hypothesisShortLabel('variant_remove_A_prev->B'), '− A t-1 → B')
+  assert.equal(hypothesisShortLabel('prompted_add_A->B'), '+ A → B')
 })
 
 test('shortId keeps the first 8 characters', () => {

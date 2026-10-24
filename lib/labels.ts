@@ -14,23 +14,26 @@ export function variableLabel(variable: string): string {
   return isLagged(variable) ? `${variable.slice(0, -LAG_SUFFIX.length)} t-1` : variable
 }
 
-// Variants are named by the one edge they add to or remove from their parent.
-const VARIANT = /^variant_(add|remove)_(.+)->(.+)$/
+// A hypothesis is named by the one edge it changes in its parent: one the
+// evidence prompted (added or turned round) or a blind variant (added or removed).
+const CHANGE = /^(?:prompted|variant)_(add|remove|reverse)_(.+)->(.+)$/
+const SYMBOL: Record<string, string> = { add: '+', remove: '−', reverse: '⇄' }
 
 /**
- * "variant_add_A_prev->B" → "+ A t-1 → B", "variant_remove_A->B" → "− A → B".
- * Seed hypotheses ("T_persistence: …") are already readable and pass through.
+ * "variant_add_A_prev->B" → "+ A t-1 → B", "variant_remove_A->B" → "− A → B",
+ * "prompted_reverse_A->C" → "⇄ A → C". The starting structure
+ * ("unconnected: …") is already readable and passes through.
  */
 export function hypothesisLabel(name: string): string {
-  const m = VARIANT.exec(name)
+  const m = CHANGE.exec(name)
   if (!m) return name
   const [, op, source, target] = m
-  return `${op === 'add' ? '+' : '−'} ${variableLabel(source)} → ${variableLabel(target)}`
+  return `${SYMBOL[op]} ${variableLabel(source)} → ${variableLabel(target)}`
 }
 
-/** hypothesisLabel without a seed's description: "T_persistence: …" → "T_persistence". */
+/** hypothesisLabel without a description: "unconnected: …" → "unconnected". */
 export function hypothesisShortLabel(name: string): string {
-  return VARIANT.test(name) ? hypothesisLabel(name) : name.split(':')[0]
+  return CHANGE.test(name) ? hypothesisLabel(name) : name.split(':')[0]
 }
 
 /** Enough of a UUID to tell candidates apart at a glance. */

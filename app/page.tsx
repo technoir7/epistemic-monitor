@@ -454,7 +454,7 @@ export default function Dashboard() {
             <div className="exp-label">Level 3 — structure</div>
             <div className="exp-term">
               <span className="exp-term-key">ontology population</span>
-              <span className="exp-term-val">Competing whole worldviews. Each is a complete belief structure. Evidence scores them. Weak ones are discarded.</span>
+              <span className="exp-term-val">Competing whole worldviews. Each is a complete belief structure, formed from the evidence: the engine starts with none. Evidence scores them. Weak ones are discarded.</span>
             </div>
           </div>
 

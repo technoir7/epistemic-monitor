@@ -106,7 +106,7 @@ export interface ShiftEvent {
   // recorded before the engine kept them.
   /** YYYY-MM-DD of the evidence that caused the shift. */
   evidence_date?: string | null
-  /** Research programme of each leader, e.g. "T_persistence". */
+  /** Research programme of each leader: the pair it was founded on, e.g. "InflationShock_prev–InflationShock". */
   previous_programme?: string | null
   new_programme?: string | null
 }
