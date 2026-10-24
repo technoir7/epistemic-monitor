@@ -103,7 +103,9 @@ export default function EpistemicStateBar({ domain }: Props) {
           {hypothesisLabel(data.dominant_hypothesis.name)}
         </div>
         <div className="metric-sub">
-          {shortId(data.dominant_hypothesis.candidate_id)} · leading for {data.dominant_hypothesis.generations_dominant} gen
+          {shortId(data.dominant_hypothesis.candidate_id)}
+          {data.dominant_hypothesis.generations_dominant != null &&
+            ` · leading for ${data.dominant_hypothesis.generations_dominant} gen`}
         </div>
       </div>
 

@@ -22,7 +22,8 @@ export interface PopulationStatus {
   dominant_hypothesis: {
     name: string
     candidate_id: string
-    generations_dominant: number
+    /** Null when the engine's shift log cannot say when the leader took over. */
+    generations_dominant: number | null
   }
   paradigm_shifts_this_window: number
   frontier_edge_count: number
