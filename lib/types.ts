@@ -96,10 +96,18 @@ export interface InferenceResponse {
 export interface ShiftEvent {
   shift_id: string
   generation: number
+  /** When the engine recorded the shift (server clock, ISO). */
   timestamp: string
   previous_dominant_name: string
   new_dominant_name: string
   evidence_count_at_shift: number
+  // The fields below are absent from older engines and null on shifts
+  // recorded before the engine kept them.
+  /** YYYY-MM-DD of the evidence that caused the shift. */
+  evidence_date?: string | null
+  /** Research programme of each leader, e.g. "T_persistence". */
+  previous_programme?: string | null
+  new_programme?: string | null
 }
 
 export interface ShiftsResponse {

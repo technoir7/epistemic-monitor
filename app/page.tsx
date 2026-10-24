@@ -592,7 +592,7 @@ export default function Dashboard() {
             </div>
             <div className="exp-term">
               <span className="exp-term-key">paradigm_shifts</span>
-              <span className="exp-term-val">How many times has the dominant worldview changed? A Kuhnian shift encoded in data.</span>
+              <span className="exp-term-val">How many times has the leading hypothesis changed? Worldview changes (Kuhnian shifts) and revisions within one worldview both count.</span>
             </div>
             <div className="exp-term">
               <span className="exp-term-key">frontier_edges</span>

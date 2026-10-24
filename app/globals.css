@@ -257,7 +257,8 @@ header {
 .main-grid {
   display: grid;
   grid-template-columns: 1fr 1fr 300px;
-  grid-template-rows: 112px 150px 252px 144px 88px 38px;
+  /* Row 4 (shift history) grows with its labels instead of spilling into row 5. */
+  grid-template-rows: 112px 150px 252px minmax(144px, auto) 88px 38px;
   grid-auto-rows: 88px;
   align-items: stretch;
   gap: 8px;
@@ -664,54 +665,52 @@ header {
 }
 
 .shift-event {
-  flex: 1 0 80px;
+  flex: 1 0 170px;
   display: flex;
   flex-direction: column;
   align-items: center;
   min-width: 0;
+  padding: 0 6px;
 }
 
 .shift-dot {
   width: 8px;
   height: 8px;
-  border: 1px solid var(--border-bright);
-  background: var(--bg);
+  border: 1px solid var(--amber);
+  background: var(--amber-dim);
+  box-shadow: 0 0 6px rgba(255,179,0,0.4);
   margin-bottom: 8px;
   position: relative;
   z-index: 1;
 }
 
-.shift-dot.is-shift { border-color: var(--amber); background: var(--amber-dim); box-shadow: 0 0 6px rgba(255,179,0,0.4); }
-.shift-dot.is-now   { border-color: var(--green);  background: var(--green);    box-shadow: 0 0 8px var(--green); animation: pulse 2s ease-in-out infinite; }
-
-@keyframes pulse {
-  0%,100% { box-shadow: 0 0 8px var(--green); }
-  50%      { box-shadow: 0 0 2px var(--green); }
+/* A revision refines the current worldview: same mark, hollow and quiet. */
+.shift-revision .shift-dot {
+  border-color: var(--text-faint);
+  background: var(--bg);
+  box-shadow: none;
 }
 
 .shift-label {
   font-size: 9px;
-  color: var(--text-faint);
+  color: var(--amber);
   text-align: center;
-  max-width: 80px;
+  max-width: 160px;
   line-height: 1.4;
   letter-spacing: 0.04em;
-  white-space: pre-line;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
 }
 
-.shift-label.sl-shift { color: var(--amber); }
-.shift-label.sl-now   { color: var(--green); }
+.shift-revision .shift-label { color: var(--text-dark); }
 
-.timeline:has(.shift-event:nth-of-type(11)) .shift-event {
-  flex-basis: 64px;
-}
-
-.timeline:has(.shift-event:nth-of-type(11)) .shift-label {
+.shift-kind {
   font-size: 8px;
-  max-width: 60px;
-  line-height: 1.35;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
 }
+
+.shift-date { color: var(--text); }
+.shift-meta { color: var(--text-faint); margin-top: 2px; }
 
 .timeline-scroll::-webkit-scrollbar       { height: 2px; }
 .timeline-scroll::-webkit-scrollbar-track { background: var(--border); }

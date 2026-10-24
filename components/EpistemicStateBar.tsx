@@ -109,7 +109,7 @@ export default function EpistemicStateBar({ domain }: Props) {
 
       {/* paradigm_shifts */}
       <div className="state-metric has-tip">
-        <div className="tip">Total recorded number of times the dominant worldview has changed. Each shift is a Kuhnian paradigm change — the previously dominant belief structure lost enough ground that a different one took over.</div>
+        <div className="tip">Times the leading hypothesis has changed. Counts both worldview changes (a different research programme took over, a Kuhnian paradigm shift) and revisions within one worldview. The timeline below tells them apart.</div>
         <div className="metric-label">paradigm_shifts</div>
         <div className={`metric-value ${ShiftsColor(totalShifts ?? 0)}`}>
           {totalShifts ?? '--'}
