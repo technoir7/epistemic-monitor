@@ -3,7 +3,7 @@
 A live dashboard for the
 [Probabilistic Ontology Engine](https://github.com/technoir7/probabilistic_ontology_engine),
 a system that keeps several rival explanations of a domain (the macro economy,
-credit, energy, crypto and eight others), scores each against public data as it
+credit, energy, crypto and seven others), scores each against public data as it
 arrives week by week, and changes which one it believes when the evidence says
 to. This dashboard shows that state of belief: which explanation leads, how sure
 the engine is, what it is still unsure about, and when it changed its mind.
