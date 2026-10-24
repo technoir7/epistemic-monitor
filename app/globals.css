@@ -625,7 +625,7 @@ header {
 
 .ev-row {
   display: grid;
-  grid-template-columns: 52px 1fr 40px;
+  grid-template-columns: 64px 1fr 40px;
   gap: 8px;
   align-items: start;
   padding: 5px 8px;
@@ -642,7 +642,7 @@ header {
 .ev-row.ev-weak   { border-left-color: var(--border-bright); }
 
 .ev-time   { color: var(--text-faint); }
-.ev-desc   { color: var(--text-dim); line-height: 1.4; }
+.ev-desc   { color: var(--text-dim); line-height: 1.4; overflow-wrap: anywhere; }
 .ev-impact { color: var(--green-dim); text-align: right; }
 
 /* ── Paradigm shift timeline ── */

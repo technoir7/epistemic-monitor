@@ -49,7 +49,7 @@ export default function EvidenceStream({ domain }: Props) {
         )}
         {records.map((r) => (
           <div key={r.id} className={`ev-row ${rowClass(r.strength)}`}>
-            <span className="ev-time">{r.timestamp}</span>
+            <span className="ev-time" title={r.timestamp}>{r.timestamp.slice(0, 10)}</span>
             <span className="ev-desc">{r.description}</span>
             <span className="ev-impact">{impactLabel(r.impact_delta)}</span>
           </div>
