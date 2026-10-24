@@ -600,7 +600,7 @@ export default function Dashboard() {
             </div>
             <div className="exp-term">
               <span className="exp-term-key">log_score</span>
-              <span className="exp-term-val">Cumulative fit of a worldview against observed evidence. More negative = worse fit.</span>
+              <span className="exp-term-val">Cumulative fit of a worldview against all evidence so far. More negative = worse fit. Candidates are ranked by recent fit, minus a penalty for complexity, so this total does not set the order.</span>
             </div>
             <div className="exp-term">
               <span className="exp-term-key">exploring (amber)</span>

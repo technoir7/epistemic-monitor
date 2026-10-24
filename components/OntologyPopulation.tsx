@@ -78,6 +78,10 @@ export default function OntologyPopulation({ domain }: Props) {
         ontology_population · gen {gen}
         <div className="tip" style={{ left: 0, transform: 'none' }}>Competing belief structures scored against evidence. Each candidate is a complete hypothesis about how this domain works. The dominant candidate is the system&apos;s current best worldview. Low-scoring candidates are pruned; variants of survivors are introduced each generation.</div>
       </div>
+      <div className="population-note">
+        log_score = total fit over all evidence. Rank = recent fit, minus a
+        penalty for complexity, so a higher log_score can sit lower.
+      </div>
       <div className="candidate-list">
         {candidates.length === 0 && (
           <div style={{ color: 'var(--text-faint)', fontSize: 10 }}>loading…</div>
@@ -97,7 +101,7 @@ export default function OntologyPopulation({ domain }: Props) {
               </div>
               <div className="cand-score">
                 {fmtScore(c.log_score)}
-                <span>log_score</span>
+                <span title="Log-likelihood of all evidence so far; closer to 0 fits better. Not the ranking score.">log_score</span>
               </div>
             </div>
             <div className="bar-track">
