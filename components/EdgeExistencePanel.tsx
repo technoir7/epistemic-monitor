@@ -3,6 +3,7 @@
 import useSWR from 'swr'
 import type { Domain, InferenceResponse, QueryRequest } from '@/lib/types'
 import { fetchInferenceQuery } from '@/lib/api'
+import { shortId, variableLabel } from '@/lib/labels'
 
 const POLL = 30_000
 
@@ -52,7 +53,7 @@ export default function EdgeExistencePanel({ domain }: Props) {
   return (
     <div className="panel edge-panel">
       <div className="panel-label has-tip">
-        edge_existence_probabilities{data ? ` · ${data.candidate_id}` : ''}
+        edge_existence_probabilities{data ? ` · ${shortId(data.candidate_id)}` : ''}
         <div className="tip" style={{ left: 0, transform: 'none' }}>Probability that each relationship actually exists, learned from evidence. Not assumed — the system starts uncertain and updates toward 0 or 1 as evidence accumulates. Near 0.5 means genuinely unresolved.</div>
       </div>
       <div className="edge-list">
@@ -76,9 +77,9 @@ export default function EdgeExistencePanel({ domain }: Props) {
               <div className="tip" style={{ left: 0, transform: 'none' }}>{edgeTip}</div>
               <div>
                 <div className="edge-relation">
-                  {e.source}
+                  {variableLabel(e.source)}
                   <span className="edge-arrow">→</span>
-                  {e.target}
+                  {variableLabel(e.target)}
                   {badge && (
                     <span
                       className="edge-badge"

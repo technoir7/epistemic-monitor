@@ -3,6 +3,7 @@
 import useSWR from 'swr'
 import type { Domain, PopulationStatus, ShiftsResponse } from '@/lib/types'
 import { fetchPopulationShifts, fetchPopulationStatus } from '@/lib/api'
+import { hypothesisLabel, shortId } from '@/lib/labels'
 
 const POLL = 30_000
 
@@ -98,9 +99,11 @@ export default function EpistemicStateBar({ domain }: Props) {
       <div className="state-metric has-tip">
         <div className="tip">The ontology candidate currently scoring highest against observed evidence. This is the system&apos;s best current worldview — the belief structure that has best survived contact with reality so far.</div>
         <div className="metric-label">dominant_hypothesis</div>
-        <div className="metric-name">{data.dominant_hypothesis.name}</div>
+        <div className="metric-name" title={data.dominant_hypothesis.name}>
+          {hypothesisLabel(data.dominant_hypothesis.name)}
+        </div>
         <div className="metric-sub">
-          {data.dominant_hypothesis.candidate_id} · {data.dominant_hypothesis.generations_dominant} gen dominant
+          {shortId(data.dominant_hypothesis.candidate_id)} · leading for {data.dominant_hypothesis.generations_dominant} gen
         </div>
       </div>
 

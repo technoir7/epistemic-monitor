@@ -3,6 +3,7 @@
 import useSWR from 'swr'
 import type { Domain, CandidatesResponse, Candidate } from '@/lib/types'
 import { fetchCandidates } from '@/lib/api'
+import { hypothesisLabel, shortId } from '@/lib/labels'
 
 const POLL = 30_000
 
@@ -91,8 +92,8 @@ export default function OntologyPopulation({ domain }: Props) {
             </div>
             <div className="cand-header">
               <div className="cand-name">
-                <strong>{c.name}</strong>
-                {c.id} · {c.evidence_count} ev · gen {c.generation_introduced}
+                <strong title={c.name}>{hypothesisLabel(c.name)}</strong>
+                <span className="cand-id">{shortId(c.id)}</span> · {c.evidence_count} ev · gen {c.generation_introduced}
               </div>
               <div className="cand-score">
                 {fmtScore(c.log_score)}

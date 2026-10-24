@@ -442,12 +442,19 @@ header {
 .cand-header {
   display: flex;
   justify-content: space-between;
+  gap: 8px;
   margin-bottom: 6px;
 }
 
 .cand-name {
   font-size: 11px;
   color: var(--text-dim);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.cand-id {
+  color: var(--text-faint);
 }
 
 .cand-name strong {
@@ -463,6 +470,7 @@ header {
   font-size: 18px;
   color: var(--green-dim);
   text-align: right;
+  flex-shrink: 0;
 }
 
 .cand-score span {

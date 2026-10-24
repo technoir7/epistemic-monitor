@@ -2,8 +2,9 @@
 
 import { useEffect, useRef } from 'react'
 import useSWR from 'swr'
-import type { Domain, InferenceResponse, QueryRequest, GraphNode, GraphEdge } from '@/lib/types'
-import { fetchInferenceQuery } from '@/lib/api'
+import type { Domain, CandidatesResponse, InferenceResponse, QueryRequest, GraphNode } from '@/lib/types'
+import { fetchCandidates, fetchInferenceQuery } from '@/lib/api'
+import { hypothesisShortLabel, isLagged, shortId, variableLabel } from '@/lib/labels'
 
 const POLL = 30_000
 
@@ -60,12 +61,6 @@ function nodeTextColor(status: GraphNode['status']): string {
     case 'exploring': return C.amber
     case 'weak':      return C.greenFaint
   }
-}
-
-const LAG_SUFFIX = '_prev'
-
-function displayLabel(label: string): string {
-  return label.endsWith(LAG_SUFFIX) ? `${label.slice(0, -LAG_SUFFIX.length)} t-1` : label
 }
 
 // Share Tech Mono is monospaced: about 0.6em per character.
@@ -168,8 +163,8 @@ export default function BeliefGraph({ domain, targetVariable = 'price_up' }: Pro
       // graph with noise.
       const linked = new Set(data.edges.flatMap(e => [e.source, e.target]))
       const nodes: SimNode[] = data.nodes
-        .filter(n => !n.label.endsWith(LAG_SUFFIX) || linked.has(n.id))
-        .map(n => ({ ...n, label: displayLabel(n.label) }))
+        .filter(n => !isLagged(n.label) || linked.has(n.id))
+        .map(n => ({ ...n, label: variableLabel(n.label) }))
       const nodeById = new Map(nodes.map(n => [n.id, n]))
 
       const links: SimLink[] = data.edges.map(e => ({
@@ -335,10 +330,18 @@ export default function BeliefGraph({ domain, targetVariable = 'price_up' }: Pro
     }
   }, [data, domain])
 
+  // Same key as OntologyPopulation, so this reuses its request.
+  const { data: candidates } = useSWR<CandidatesResponse>(
+    ['candidates', domain],
+    fetchCandidates,
+    { refreshInterval: POLL, revalidateOnFocus: false },
+  )
+  const graphName = data && candidates?.candidates.find(c => c.id === data.candidate_id)?.name
+
   const label = error
     ? 'active_belief_graph · API ERROR'
     : data
-      ? `active_belief_graph · ${data.candidate_id}`
+      ? `active_belief_graph · ${graphName ? hypothesisShortLabel(graphName) : shortId(data.candidate_id)}`
       : 'active_belief_graph · loading…'
 
   return (

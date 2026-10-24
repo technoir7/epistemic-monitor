@@ -3,6 +3,7 @@
 import useSWR from 'swr'
 import type { Domain, ShiftsResponse } from '@/lib/types'
 import { fetchPopulationShifts } from '@/lib/api'
+import { hypothesisLabel } from '@/lib/labels'
 
 const POLL = 30_000
 
@@ -43,7 +44,7 @@ export default function ParadigmShiftTimeline({ domain }: Props) {
                 <div className="shift-label sl-shift">
                   gen {e.generation}
                   {'\n'}
-                  {e.previous_dominant_name} → {e.new_dominant_name}
+                  {hypothesisLabel(e.previous_dominant_name)} → {hypothesisLabel(e.new_dominant_name)}
                   {'\n'}
                   {e.timestamp}
                   {'\n'}
