@@ -8,6 +8,14 @@ import { hypothesisShortLabel, isLagged, shortId, variableLabel } from '@/lib/la
 
 const POLL = 30_000
 
+// Layout runs in viewBox units; the browser scales the result to the panel.
+// Measuring the element instead put phones' layout in the wrong space.
+const W = 520
+const H = 300
+const LEGEND_Y = H - 16
+// Lowest a node's bottom edge may sit, leaving the legend row clear.
+const NODE_FLOOR = LEGEND_Y - 12
+
 // D3 augmented node type
 interface SimNode extends GraphNode {
   x?: number
@@ -115,16 +123,13 @@ export default function BeliefGraph({ domain, targetVariable = 'price_up' }: Pro
 
     // Lazy-load d3 only on client
     let cancelled = false
+    let stopSim: (() => void) | undefined
 
     async function render() {
       const d3 = await import('d3')
       if (cancelled || !svgRef.current || !data) return
 
-      const el = svgRef.current
-      const W = el.clientWidth  || 520
-      const H = el.clientHeight || 300
-
-      const svg = d3.select(el)
+      const svg = d3.select(svgRef.current)
       svg.selectAll('*').remove()
 
       // ── Defs: arrowhead markers ──────────────────────────────────────────
@@ -178,6 +183,8 @@ export default function BeliefGraph({ domain, targetVariable = 'price_up' }: Pro
       const manyNodes = nodes.length >= 7
       // Shrink nodes slightly when there are many (e.g. 8 for MR domain)
       const NH = manyNodes ? 32 : 40
+      // The target carries a 22px number under its label, so it gets room for both.
+      const height = (n: SimNode) => n.status === 'target' ? NH + 16 : NH
       const width = (n: SimNode) => boxWidth(n.label, 9, manyNodes ? 58 : 76)
       const sim = d3.forceSimulation<SimNode>(nodes)
         .force('link',
@@ -187,7 +194,10 @@ export default function BeliefGraph({ domain, targetVariable = 'price_up' }: Pro
             .strength(0.7)
         )
         .force('charge', d3.forceManyBody<SimNode>().strength(manyNodes ? -220 : -320))
-        .force('center', d3.forceCenter(W / 2, H / 2))
+        .force('center', d3.forceCenter(W / 2, NODE_FLOOR / 2))
+        // The canvas is wide and short; without a pull toward the middle row
+        // the charge piles nodes along the top and bottom edges.
+        .force('y', d3.forceY<SimNode>(NODE_FLOOR / 2).strength(0.08))
         .force('collision', d3.forceCollide<SimNode>(n => Math.max(width(n) / 2, manyNodes ? 40 : 52) + 4))
         .alphaDecay(0.04)
 
@@ -208,21 +218,6 @@ export default function BeliefGraph({ domain, targetVariable = 'price_up' }: Pro
         })
         .attr('opacity', d => d.status === 'weak' ? 0.5 : 0.85)
 
-      // Edge probability labels
-      const linkLabels = svg.append('g').attr('class', 'link-labels')
-        .selectAll('text')
-        .data(links)
-        .enter()
-        .append('text')
-        .attr('font-family', 'Share Tech Mono, monospace')
-        .attr('font-size', 9)
-        .attr('fill', d => {
-          if (d.status === 'strong')  return C.textDim
-          if (d.status === 'explore') return C.amber
-          return C.borderFaint
-        })
-        .text(d => d.probability.toFixed(2))
-
       // ── Node group ───────────────────────────────────────────────────────
       const nodeG = svg.append('g').attr('class', 'nodes')
 
@@ -234,40 +229,64 @@ export default function BeliefGraph({ domain, targetVariable = 'price_up' }: Pro
 
       nodeGroups.append('rect')
         .attr('x', d => -width(d) / 2)
-        .attr('y', -NH / 2)
+        .attr('y', d => -height(d) / 2)
         .attr('width', width)
-        .attr('height', NH)
+        .attr('height', height)
         .attr('fill', d => d.status === 'target' ? '#001505' : nodeFill(d.status))
         .attr('stroke', d => nodeStroke(d.status))
         .attr('stroke-width', d => d.status === 'target' ? 1.5 : 1)
         .attr('stroke-dasharray', d => d.status === 'exploring' ? '4,3' : null)
 
-      // Label line 1: node id / label
+      const secondLine = (d: SimNode): string => {
+        if (d.status === 'target' && d.probability != null) return d.probability.toFixed(2)
+        if (d.observation) return d.observation
+        if (d.probability != null) return `p=${d.probability.toFixed(2)}`
+        if (d.status === 'exploring') return 'exploring'
+        return ''
+      }
+      const isTargetValue = (d: SimNode) => d.status === 'target' && d.probability != null
+
+      // Line 1: the variable. Centred alone, raised when a second line follows.
       nodeGroups.append('text')
-        .attr('y', d => (d.observation || d.probability != null) ? -7 : 4)
+        .attr('y', d => isTargetValue(d) ? -10 : secondLine(d) ? -4 : 3)
         .attr('text-anchor', 'middle')
         .attr('font-family', 'Share Tech Mono, monospace')
         .attr('font-size', 9)
         .attr('fill', d => nodeTextColor(d.status))
         .text(d => d.label)
 
-      // Label line 2: observation or probability
+      // Line 2: observation, probability, or "exploring"
       nodeGroups.append('text')
-        .attr('y', 9)
+        .attr('y', d => isTargetValue(d) ? 15 : 8)
         .attr('text-anchor', 'middle')
-        .attr('font-family', d => d.status === 'target' ? 'VT323, monospace' : 'Share Tech Mono, monospace')
-        .attr('font-size', d => d.status === 'target' ? 22 : 8)
+        .attr('font-family', d => isTargetValue(d) ? 'VT323, monospace' : 'Share Tech Mono, monospace')
+        .attr('font-size', d => isTargetValue(d) ? 22 : 8)
         .attr('fill', d => nodeTextColor(d.status))
-        .text(d => {
-          if (d.status === 'target' && d.probability != null) return d.probability.toFixed(2)
-          if (d.observation) return d.observation
-          if (d.probability != null && d.status !== 'target') return `p=${d.probability.toFixed(2)}`
-          if (d.status === 'exploring') return 'exploring'
-          return ''
+        .text(secondLine)
+
+      // Edge probabilities go above the nodes, outlined in black, so a node
+      // or a crossing edge never hides one.
+      const linkLabels = svg.append('g').attr('class', 'link-labels')
+        .selectAll('text')
+        .data(links)
+        .enter()
+        .append('text')
+        .attr('text-anchor', 'middle')
+        .attr('font-family', 'Share Tech Mono, monospace')
+        .attr('font-size', 9)
+        .attr('fill', d => {
+          if (d.status === 'strong')  return C.textDim
+          if (d.status === 'explore') return C.amber
+          return C.borderFaint
         })
+        .attr('stroke', C.bg)
+        .attr('stroke-width', 3)
+        .attr('stroke-linejoin', 'round')
+        .attr('paint-order', 'stroke')
+        .text(d => d.probability.toFixed(2))
 
       // ── Legend ───────────────────────────────────────────────────────────
-      const legendY = H - 16
+      const legendY = LEGEND_Y
       const legendItems = [
         { x: 20,  color: C.greenDim, dash: '',    label: 'established' },
         { x: 110, color: C.amber,    dash: '4,3', label: 'exploring' },
@@ -291,18 +310,47 @@ export default function BeliefGraph({ domain, targetVariable = 'price_up' }: Pro
       }
 
       // ── Tick ─────────────────────────────────────────────────────────────
+      const clamp = () => nodes.forEach(n => {
+        n.x = Math.max(width(n) / 2 + 4, Math.min(W - width(n) / 2 - 4, n.x ?? W / 2))
+        n.y = Math.max(height(n) / 2 + 4, Math.min(NODE_FLOOR - height(n) / 2, n.y ?? H / 2))
+      })
+
       sim.on('tick', () => {
-        // Clamp to SVG bounds
-        nodes.forEach(n => {
-          n.x = Math.max(width(n) / 2 + 4, Math.min(W - width(n) / 2 - 4, n.x ?? W / 2))
-          n.y = Math.max(NH / 2 + 4, Math.min(H - 24, n.y ?? H / 2))
-        })
+        // forceCollide treats boxes as circles and the clamp piles nodes
+        // against the edges, so wide boxes still overlap; push apart any
+        // pair that does, along the axis where they overlap least.
+        clamp()
+        for (let i = 0; i < nodes.length; i++) {
+          for (let j = i + 1; j < nodes.length; j++) {
+            const a = nodes[i], b = nodes[j]
+            const dx = (b.x ?? 0) - (a.x ?? 0), dy = (b.y ?? 0) - (a.y ?? 0)
+            const ox = (width(a) + width(b)) / 2 + 6 - Math.abs(dx)
+            const oy = (height(a) + height(b)) / 2 + 6 - Math.abs(dy)
+            if (ox <= 0 || oy <= 0) continue
+            const sy = dy < 0 ? -1 : 1
+            // Against a top or bottom edge only a sideways push can stick.
+            const yBlocked =
+              (a.y ?? 0) - sy * oy / 2 < height(a) / 2 + 4 ||
+              (b.y ?? 0) + sy * oy / 2 > NODE_FLOOR - height(b) / 2 ||
+              (a.y ?? 0) - sy * oy / 2 > NODE_FLOOR - height(a) / 2 ||
+              (b.y ?? 0) + sy * oy / 2 < height(b) / 2 + 4
+            if (ox < oy || yBlocked) {
+              const sx = dx < 0 ? -1 : 1
+              a.x = (a.x ?? 0) - sx * ox / 2
+              b.x = (b.x ?? 0) + sx * ox / 2
+            } else {
+              a.y = (a.y ?? 0) - sy * oy / 2
+              b.y = (b.y ?? 0) + sy * oy / 2
+            }
+          }
+        }
+        clamp()
 
         linkLines
           .attr('x1', d => (d.source as SimNode).x ?? 0)
           .attr('y1', d => (d.source as SimNode).y ?? 0)
-          .attr('x2', d => (d.target as SimNode).x ?? 0)
-          .attr('y2', d => (d.target as SimNode).y ?? 0)
+          .attr('x2', d => edgeEnd(d)[0])
+          .attr('y2', d => edgeEnd(d)[1])
 
         linkLabels
           .attr('x', d => {
@@ -319,14 +367,28 @@ export default function BeliefGraph({ domain, targetVariable = 'price_up' }: Pro
         nodeGroups.attr('transform', d => `translate(${d.x ?? 0},${d.y ?? 0})`)
       })
 
-      // Stop sim after it settles (saves CPU)
-      sim.on('end', () => sim.stop())
+      // Stop the arrow at the target's border; at its centre the box hides it.
+      function edgeEnd(d: SimLink): [number, number] {
+        const s = d.source as SimNode
+        const t = d.target as SimNode
+        const tx = t.x ?? 0, ty = t.y ?? 0
+        const dx = tx - (s.x ?? 0), dy = ty - (s.y ?? 0)
+        const scale = Math.min(
+          (width(t) / 2 + 2) / (Math.abs(dx) || 1e-9),
+          (height(t) / 2 + 2) / (Math.abs(dy) || 1e-9),
+        )
+        return scale >= 1 ? [tx, ty] : [tx - dx * scale, ty - dy * scale]
+      }
+
+      stopSim = () => sim.stop()
     }
 
     render()
 
+    // A poll re-renders into the same SVG; the old simulation must not keep ticking.
     return () => {
       cancelled = true
+      stopSim?.()
     }
   }, [data, domain])
 
