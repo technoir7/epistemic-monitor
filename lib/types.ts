@@ -131,94 +131,6 @@ export interface EvidenceResponse {
   records: EvidenceRecord[]
 }
 
-// ─── POST /v1/inference/query → RegimeStatePanel (mr) ────────────────────────
-export type MrVariableName =
-  | 'YieldCurveInverted'
-  | 'InflationShock'
-  | 'LiquidityStress'
-  | 'CreditSpreadStress'
-  | 'VolatilityShock'
-  | 'DollarStrength'
-  | 'EquityRiskOn'
-  | 'AIRiskOn'
-
-// ─── POST /v1/inference/query → AiRegimeStatePanel ──────────────────────────
-export type AiVariableName =
-  | 'SemiconductorMomentum'
-  | 'MarketConcentrationExtreme'
-  | 'HyperscalerCapexAccelerating'
-  | 'TechValuationDetached'
-  | 'IPInvestmentRising'
-  | 'LaborProductivityImproving'
-  | 'BroadEconomicLift'
-  | 'AIRiskPremiumCompressed'
-
-// ─── POST /v1/inference/query → SdRegimeStatePanel ───────────────────────────
-export type SdVariableName =
-  | 'USYieldSpiking'
-  | 'SpreadWidening'
-  | 'DollarStrengthening'
-  | 'FedBalanceSheetShrinking'
-  | 'EMStressElevated'
-  | 'FiscalDominanceRisk'
-  | 'CreditDefaultRisk'
-  | 'GlobalLiquidityContracting'
-
-// ─── POST /v1/inference/query → CcRegimeStatePanel ───────────────────────────
-export type CcVariableName =
-  | 'HYSpreadElevated'
-  | 'LeveragedLoanStress'
-  | 'CorporateDefaultRisk'
-  | 'CreditImpulseNegative'
-  | 'BankLendingTightening'
-  | 'InvestmentGradeSpread'
-  | 'HighYieldIssuanceFalling'
-  | 'RefinancingStress'
-
-// ─── POST /v1/inference/query → ErRegimeStatePanel ───────────────────────────
-export type ErVariableName =
-  | 'OilPriceSurge'
-  | 'NatGasPriceSurge'
-  | 'EnergyEquityMomentum'
-  | 'OPECSupplyConstraint'
-  | 'RenewablesDisplacement'
-  | 'EnergyInflationPersistent'
-  | 'GeopoliticalRiskElevated'
-  | 'DemandDestructionRisk'
-
-// ─── POST /v1/inference/query → CrRegimeStatePanel ───────────────────────────
-export type CrVariableName =
-  | 'BTCMomentumPositive'
-  | 'AltcoinSeasonActive'
-  | 'OnChainActivityElevated'
-  | 'StablecoinFlowPositive'
-  | 'CryptoVolatilityShock'
-  | 'RiskAssetCorrelation'
-  | 'NarrativeMomentum'
-  | 'DollarDebasementNarrative'
-
-// ─── POST /v1/inference/query → GpRegimeStatePanel ───────────────────────────
-export type GpVariableName =
-  | 'ConflictIntensityElevated'
-  | 'TradeDisruptionRisk'
-  | 'SanctionsPressureElevated'
-  | 'DiplomaticTensionHigh'
-  | 'SupplyChainStress'
-  | 'CurrencyWarSignal'
-  | 'EnergyWeaponizationRisk'
-  | 'GlobalTradeVolumeWeak'
-
-// ─── POST /v1/inference/query → SfRegimeStatePanel ───────────────────────────
-export type SfVariableName =
-  | 'TechHiringAccelerating'
-  | 'OfficeVacancyFalling'
-  | 'RetailClosureElevated'
-  | 'PermitActivityRising'
-  | 'CrimeIndexElevated'
-  | 'StartupFormationRising'
-  | 'FootTrafficRecovering'
-  | 'PopulationFlowPositive'
-
 // ─── POST /v1/inference/query → ArtRegimeStatePanel ──────────────────────────
 export type ArtVariableName =
   | 'InstitutionalRiskAversion'
@@ -246,17 +158,6 @@ export type ArtVariableName =
   | 'AuthenticityPremium'
   | 'NeoAcademicResurgence'
   | 'AttentionFragmentation'
-
-// ─── POST /v1/inference/query → LmRegimeStatePanel ───────────────────────────
-export type LmVariableName =
-  | 'UnemploymentRising'
-  | 'WageInflationPersistent'
-  | 'JobOpeningsFalling'
-  | 'LayoffCycleBeginning'
-  | 'LaborProductivityWeak'
-  | 'ParticipationRateFalling'
-  | 'RealWageGrowthPositive'
-  | 'TightLaborMarket'
 
 // ─── GET /v1/debug/entropy → console diagnostics ────────────────────────────
 export interface VariableEntropyDebug {

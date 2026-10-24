@@ -67,6 +67,11 @@ export async function fetchCandidates(
 export async function fetchInferenceQuery(
   [, req]: [string, QueryRequest],
 ): Promise<InferenceResponse> {
+  return queryInference(req)
+}
+
+/** One posterior query: a POST that runs inference on the engine. */
+export async function queryInference(req: QueryRequest): Promise<InferenceResponse> {
   return post('/v1/inference/query', req)
 }
 

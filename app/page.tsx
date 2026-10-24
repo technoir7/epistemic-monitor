@@ -14,14 +14,6 @@ import ExplorationFrontier from '@/components/ExplorationFrontier'
 import DomainReport        from '@/components/DomainReport'
 import PromptLine          from '@/components/PromptLine'
 import RegimeStatePanel    from '@/components/RegimeStatePanel'
-import AiRegimeStatePanel  from '@/components/AiRegimeStatePanel'
-import SdRegimeStatePanel  from '@/components/SdRegimeStatePanel'
-import CcRegimeStatePanel  from '@/components/CcRegimeStatePanel'
-import ErRegimeStatePanel  from '@/components/ErRegimeStatePanel'
-import LmRegimeStatePanel  from '@/components/LmRegimeStatePanel'
-import CrRegimeStatePanel  from '@/components/CrRegimeStatePanel'
-import GpRegimeStatePanel  from '@/components/GpRegimeStatePanel'
-import SfRegimeStatePanel  from '@/components/SfRegimeStatePanel'
 import ArtRegimeStatePanel from '@/components/ArtRegimeStatePanel'
 
 const DOMAINS: { key: Domain; ticker: string; label: string }[] = [
@@ -233,183 +225,50 @@ function Clock() {
   return <div className="clock">{time || '--:--:--'}</div>
 }
 
-// Each commodity domain's full panel set; the page mounts only the active one.
-function DomainPanels({ domain, visible }: { domain: Domain; visible: boolean }) {
+// Natural gas: the original commodity layout, with edge and evidence panels.
+function NgPanels() {
   return (
-    <div style={{ display: visible ? 'contents' : 'none' }}>
-      <EpistemicStateBar   domain={domain} />
-      <BeliefGraph         domain={domain} />
-      <OntologyPopulation  domain={domain} />
-      <EdgeExistencePanel  domain={domain} />
-      <EvidenceStream      domain={domain} />
+    <>
+      <EpistemicStateBar     domain="ng" />
+      <BeliefGraph           domain="ng" />
+      <OntologyPopulation    domain="ng" />
+      <EdgeExistencePanel    domain="ng" />
+      <EvidenceStream        domain="ng" />
+      <ParadigmShiftTimeline domain="ng" />
+      <ExplorationFrontier   domain="ng" />
+      <PromptLine            domain="ng" />
+    </>
+  )
+}
+
+// Variable each regime domain's belief graph asks about.
+const GRAPH_TARGET: Record<Exclude<Domain, 'ng'>, string> = {
+  mr: 'AIRiskOn',
+  ai: 'SemiconductorMomentum',
+  sd: 'USYieldSpiking',
+  cc: 'HYSpreadElevated',
+  er: 'OilPriceSurge',
+  lm: 'UnemploymentRising',
+  cr: 'BTCMomentumPositive',
+  gp: 'ConflictIntensityElevated',
+  sf: 'TechHiringAccelerating',
+  art: 'CraftPrestigeRising',
+}
+
+// Every other domain: status, graph, regime variables, population, history.
+function RegimePanels({ domain }: { domain: Exclude<Domain, 'ng'> }) {
+  return (
+    <>
+      <EpistemicStateBar domain={domain} />
+      <BeliefGraph domain={domain} targetVariable={GRAPH_TARGET[domain]} />
+      {domain === 'art'
+        ? <ArtRegimeStatePanel domain="art" />
+        : <RegimeStatePanel domain={domain} />}
+      <OntologyPopulation domain={domain} />
       <ParadigmShiftTimeline domain={domain} />
       <ExplorationFrontier domain={domain} />
-      <PromptLine          domain={domain} />
-    </div>
-  )
-}
-
-// MR (Macro Regime) panel set.
-// Uses the same grid and reuses all existing components where possible.
-function MrDomainPanels({ visible }: { visible: boolean }) {
-  return (
-    <div style={{ display: visible ? 'contents' : 'none' }}>
-      {/* Row 1 (112px): engine status spanning cols 1-2 */}
-      <EpistemicStateBar domain="mr" />
-      {/* Col 1, rows 2-3: belief graph (8-node, smaller nodes via data-driven sizing) */}
-      <BeliefGraph domain="mr" targetVariable="AIRiskOn" />
-      {/* Col 2, rows 2-3: regime state (8 boolean variables + probabilities) */}
-      <RegimeStatePanel domain="mr" />
-      {/* Col 3, rows 1-4: ontology competition */}
-      <OntologyPopulation domain="mr" />
-      {/* Paradigm shift history */}
-      <ParadigmShiftTimeline domain="mr" />
-      <ExplorationFrontier domain="mr" />
-      {/* Row 6: terminal prompt line */}
-      <PromptLine domain="mr" />
-    </div>
-  )
-}
-
-// AI Regime panel set.
-// Same layout as MrDomainPanels.
-function AiDomainPanels({ visible }: { visible: boolean }) {
-  return (
-    <div style={{ display: visible ? 'contents' : 'none' }}>
-      {/* Row 1 (112px): engine status spanning cols 1-2 */}
-      <EpistemicStateBar domain="ai" />
-      {/* Col 1, rows 2-3: belief graph targeting SemiconductorMomentum */}
-      <BeliefGraph domain="ai" targetVariable="SemiconductorMomentum" />
-      {/* Col 2, rows 2-3: regime state (8 AI boolean variables + probabilities) */}
-      <AiRegimeStatePanel domain="ai" />
-      {/* Col 3, rows 1-4: ontology competition */}
-      <OntologyPopulation domain="ai" />
-      {/* Paradigm shift history */}
-      <ParadigmShiftTimeline domain="ai" />
-      <ExplorationFrontier domain="ai" />
-      {/* Row: terminal prompt line */}
-      <PromptLine domain="ai" />
-    </div>
-  )
-}
-
-// Sovereign Debt panel set.
-function SdDomainPanels({ visible }: { visible: boolean }) {
-  return (
-    <div style={{ display: visible ? 'contents' : 'none' }}>
-      <EpistemicStateBar domain="sd" />
-      <BeliefGraph domain="sd" targetVariable="USYieldSpiking" />
-      <SdRegimeStatePanel domain="sd" />
-      <OntologyPopulation domain="sd" />
-      <ParadigmShiftTimeline domain="sd" />
-      <ExplorationFrontier domain="sd" />
-      <PromptLine domain="sd" />
-    </div>
-  )
-}
-
-// Credit Cycle panel set.
-function CcDomainPanels({ visible }: { visible: boolean }) {
-  return (
-    <div style={{ display: visible ? 'contents' : 'none' }}>
-      <EpistemicStateBar domain="cc" />
-      <BeliefGraph domain="cc" targetVariable="HYSpreadElevated" />
-      <CcRegimeStatePanel domain="cc" />
-      <OntologyPopulation domain="cc" />
-      <ParadigmShiftTimeline domain="cc" />
-      <ExplorationFrontier domain="cc" />
-      <PromptLine domain="cc" />
-    </div>
-  )
-}
-
-// Energy Regime panel set.
-function ErDomainPanels({ visible }: { visible: boolean }) {
-  return (
-    <div style={{ display: visible ? 'contents' : 'none' }}>
-      <EpistemicStateBar domain="er" />
-      <BeliefGraph domain="er" targetVariable="OilPriceSurge" />
-      <ErRegimeStatePanel domain="er" />
-      <OntologyPopulation domain="er" />
-      <ParadigmShiftTimeline domain="er" />
-      <ExplorationFrontier domain="er" />
-      <PromptLine domain="er" />
-    </div>
-  )
-}
-
-// Labor Market panel set.
-function LmDomainPanels({ visible }: { visible: boolean }) {
-  return (
-    <div style={{ display: visible ? 'contents' : 'none' }}>
-      <EpistemicStateBar domain="lm" />
-      <BeliefGraph domain="lm" targetVariable="UnemploymentRising" />
-      <LmRegimeStatePanel domain="lm" />
-      <OntologyPopulation domain="lm" />
-      <ParadigmShiftTimeline domain="lm" />
-      <ExplorationFrontier domain="lm" />
-      <PromptLine domain="lm" />
-    </div>
-  )
-}
-
-// Crypto Regime panel set.
-function CrDomainPanels({ visible }: { visible: boolean }) {
-  return (
-    <div style={{ display: visible ? 'contents' : 'none' }}>
-      <EpistemicStateBar domain="cr" />
-      <BeliefGraph domain="cr" targetVariable="BTCMomentumPositive" />
-      <CrRegimeStatePanel domain="cr" />
-      <OntologyPopulation domain="cr" />
-      <ParadigmShiftTimeline domain="cr" />
-      <ExplorationFrontier domain="cr" />
-      <PromptLine domain="cr" />
-    </div>
-  )
-}
-
-// Geopolitics panel set.
-function GpDomainPanels({ visible }: { visible: boolean }) {
-  return (
-    <div style={{ display: visible ? 'contents' : 'none' }}>
-      <EpistemicStateBar domain="gp" />
-      <BeliefGraph domain="gp" targetVariable="ConflictIntensityElevated" />
-      <GpRegimeStatePanel domain="gp" />
-      <OntologyPopulation domain="gp" />
-      <ParadigmShiftTimeline domain="gp" />
-      <ExplorationFrontier domain="gp" />
-      <PromptLine domain="gp" />
-    </div>
-  )
-}
-
-// SF Urban panel set.
-function SfDomainPanels({ visible }: { visible: boolean }) {
-  return (
-    <div style={{ display: visible ? 'contents' : 'none' }}>
-      <EpistemicStateBar domain="sf" />
-      <BeliefGraph domain="sf" targetVariable="TechHiringAccelerating" />
-      <SfRegimeStatePanel domain="sf" />
-      <OntologyPopulation domain="sf" />
-      <ParadigmShiftTimeline domain="sf" />
-      <ExplorationFrontier domain="sf" />
-      <PromptLine domain="sf" />
-    </div>
-  )
-}
-
-// Art Regime panel set.
-function ArtDomainPanels({ visible }: { visible: boolean }) {
-  return (
-    <div style={{ display: visible ? 'contents' : 'none' }}>
-      <EpistemicStateBar domain="art" />
-      <BeliefGraph domain="art" targetVariable="CraftPrestigeRising" />
-      <ArtRegimeStatePanel domain="art" />
-      <OntologyPopulation domain="art" />
-      <ParadigmShiftTimeline domain="art" />
-      <ExplorationFrontier domain="art" />
-      <PromptLine domain="art" />
-    </div>
+      <PromptLine domain={domain} />
+    </>
   )
 }
 
@@ -655,25 +514,12 @@ export default function Dashboard() {
           visible tab's queued behind the rest (30 s), and 200 more every 30 s
           for data that changes weekly. SWR's cache still shows a tab seen
           before at once when it is opened again, then refreshes it.
-          `display: contents` passes grid children through.
-          MR uses its own panel set; commodity domains share DomainPanels.
+          The key remounts the panels per domain, as separate components did.
           DomainReport is intentionally NOT inside this grid — it lives below in
           .report-section so its natural height contributes to document scroll height
           rather than being capped at the 88px grid-auto-row.
         */}
-        {active === 'mr' && <MrDomainPanels visible />}
-        {active === 'ai' && <AiDomainPanels visible />}
-        {/* NG uses the generic commodity DomainPanels, which adds edge and evidence panels */}
-        {active === 'ng' && <DomainPanels domain="ng" visible />}
-        {/* Other domains each pair the shared panels with their own regime panel */}
-        {active === 'sd' && <SdDomainPanels visible />}
-        {active === 'cc' && <CcDomainPanels visible />}
-        {active === 'er' && <ErDomainPanels visible />}
-        {active === 'lm' && <LmDomainPanels visible />}
-        {active === 'cr' && <CrDomainPanels visible />}
-        {active === 'gp' && <GpDomainPanels visible />}
-        {active === 'sf' && <SfDomainPanels visible />}
-        {active === 'art' && <ArtDomainPanels visible />}
+        {active === 'ng' ? <NgPanels /> : <RegimePanels key={active} domain={active} />}
       </div>
 
       {/*

@@ -1,56 +1,143 @@
 'use client'
 
 import useSWR from 'swr'
-import type { Domain, MrVariableName } from '@/lib/types'
+import type { Domain } from '@/lib/types'
+import { queryInference } from '@/lib/api'
 
 const POLL = 30_000
-const API_BASE =
-  process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:8000'
 
-// Display-friendly labels for each variable name
-const VAR_LABELS: Record<MrVariableName, string> = {
-  YieldCurveInverted:  'YIELD_CURVE_INV',
-  InflationShock:      'INFLATION_SHOCK',
-  LiquidityStress:     'LIQUIDITY_STRESS',
-  CreditSpreadStress:  'CREDIT_SPREAD',
-  VolatilityShock:     'VOLATILITY_SHOCK',
-  DollarStrength:      'DOLLAR_STRENGTH',
-  EquityRiskOn:        'EQUITY_RISK_ON',
-  AIRiskOn:            'AI_RISK_ON',
-}
+// The regime variables each domain shows, in display order, with the short
+// label for the row. Art has its own panel: grouped variables, nullable values.
+const REGIMES = {
+  mr: {
+    name: 'Macro',
+    variables: [
+      ['YieldCurveInverted', 'YIELD_CURVE_INV'],
+      ['InflationShock',     'INFLATION_SHOCK'],
+      ['LiquidityStress',    'LIQUIDITY_STRESS'],
+      ['CreditSpreadStress', 'CREDIT_SPREAD'],
+      ['VolatilityShock',    'VOLATILITY_SHOCK'],
+      ['DollarStrength',     'DOLLAR_STRENGTH'],
+      ['EquityRiskOn',       'EQUITY_RISK_ON'],
+      ['AIRiskOn',           'AI_RISK_ON'],
+    ],
+  },
+  ai: {
+    name: 'AI',
+    variables: [
+      ['SemiconductorMomentum',        'SEMICON_MOMENTUM'],
+      ['MarketConcentrationExtreme',   'MKT_CONCENTRATION'],
+      ['HyperscalerCapexAccelerating', 'HYPERSCALER_CAPEX'],
+      ['TechValuationDetached',        'TECH_VAL_DETACHED'],
+      ['IPInvestmentRising',           'IP_INVEST_RISING'],
+      ['LaborProductivityImproving',   'LABOR_PROD_IMPROV'],
+      ['BroadEconomicLift',            'BROAD_ECON_LIFT'],
+      ['AIRiskPremiumCompressed',      'AI_RISK_COMPRESSED'],
+    ],
+  },
+  sd: {
+    name: 'Sovereign debt',
+    variables: [
+      ['USYieldSpiking',             'US_YIELD_SPIKING'],
+      ['SpreadWidening',             'SPREAD_WIDENING'],
+      ['DollarStrengthening',        'DOLLAR_STRENGTH'],
+      ['FedBalanceSheetShrinking',   'FED_BS_SHRINKING'],
+      ['EMStressElevated',           'EM_STRESS_ELEV'],
+      ['FiscalDominanceRisk',        'FISCAL_DOM_RISK'],
+      ['CreditDefaultRisk',          'CREDIT_DEFAULT'],
+      ['GlobalLiquidityContracting', 'GLOBAL_LIQ_CONT'],
+    ],
+  },
+  cc: {
+    name: 'Credit cycle',
+    variables: [
+      ['HYSpreadElevated',         'HY_SPREAD_ELEV'],
+      ['LeveragedLoanStress',      'LEV_LOAN_STRESS'],
+      ['CorporateDefaultRisk',     'CORP_DEFAULT_RISK'],
+      ['CreditImpulseNegative',    'CREDIT_IMP_NEG'],
+      ['BankLendingTightening',    'BANK_LEND_TIGHT'],
+      ['InvestmentGradeSpread',    'IG_SPREAD'],
+      ['HighYieldIssuanceFalling', 'HY_ISSUE_FALLING'],
+      ['RefinancingStress',        'REFI_STRESS'],
+    ],
+  },
+  er: {
+    name: 'Energy',
+    variables: [
+      ['OilPriceSurge',             'OIL_PRICE_SURGE'],
+      ['NatGasPriceSurge',          'NATGAS_SURGE'],
+      ['EnergyEquityMomentum',      'ENERGY_EQ_MOM'],
+      ['OPECSupplyConstraint',      'OPEC_SUPPLY_CNST'],
+      ['RenewablesDisplacement',    'RENEW_DISPLACE'],
+      ['EnergyInflationPersistent', 'ENERGY_INF_PERS'],
+      ['GeopoliticalRiskElevated',  'GEO_RISK_ELEV'],
+      ['DemandDestructionRisk',     'DEMAND_DESTR'],
+    ],
+  },
+  lm: {
+    name: 'Labor market',
+    variables: [
+      ['UnemploymentRising',       'UNEMPLOYMENT_RISE'],
+      ['WageInflationPersistent',  'WAGE_INF_PERS'],
+      ['JobOpeningsFalling',       'JOB_OPEN_FALLING'],
+      ['LayoffCycleBeginning',     'LAYOFF_CYCLE_BEG'],
+      ['LaborProductivityWeak',    'LABOR_PROD_WEAK'],
+      ['ParticipationRateFalling', 'PARTIC_RATE_FALL'],
+      ['RealWageGrowthPositive',   'REAL_WAGE_POS'],
+      ['TightLaborMarket',         'TIGHT_LABOR_MKT'],
+    ],
+  },
+  cr: {
+    name: 'Crypto',
+    variables: [
+      ['BTCMomentumPositive',       'BTC_MOMENTUM_POS'],
+      ['AltcoinSeasonActive',       'ALTCOIN_SEASON'],
+      ['OnChainActivityElevated',   'ONCHAIN_ACTIVITY'],
+      ['StablecoinFlowPositive',    'STABLECOIN_FLOW'],
+      ['CryptoVolatilityShock',     'CRYPTO_VOL_SHOCK'],
+      ['RiskAssetCorrelation',      'RISK_ASSET_CORR'],
+      ['NarrativeMomentum',         'NARRATIVE_MOMO'],
+      ['DollarDebasementNarrative', 'USD_DEBASE_NARR'],
+    ],
+  },
+  gp: {
+    name: 'Geopolitical',
+    variables: [
+      ['ConflictIntensityElevated', 'CONFLICT_INTENS'],
+      ['TradeDisruptionRisk',       'TRADE_DISRUPT'],
+      ['SanctionsPressureElevated', 'SANCTIONS_PRESS'],
+      ['DiplomaticTensionHigh',     'DIPLOMATIC_TENS'],
+      ['SupplyChainStress',         'SUPPLY_CHN_STRSS'],
+      ['CurrencyWarSignal',         'CURRENCY_WAR'],
+      ['EnergyWeaponizationRisk',   'ENERGY_WEAPON'],
+      ['GlobalTradeVolumeWeak',     'TRADE_VOL_WEAK'],
+    ],
+  },
+  sf: {
+    name: 'SF urban',
+    variables: [
+      ['TechHiringAccelerating', 'TECH_HIRING_ACC'],
+      ['OfficeVacancyFalling',   'OFFICE_VAC_FALL'],
+      ['RetailClosureElevated',  'RETAIL_CLOSURE'],
+      ['PermitActivityRising',   'PERMIT_ACTIVITY'],
+      ['CrimeIndexElevated',     'CRIME_INDEX_ELV'],
+      ['StartupFormationRising', 'STARTUP_FORM_RIS'],
+      ['FootTrafficRecovering',  'FOOT_TRAFFIC_REC'],
+      ['PopulationFlowPositive', 'POP_FLOW_POS'],
+    ],
+  },
+} satisfies Partial<Record<Domain, { name: string; variables: [string, string][] }>>
 
-const VAR_ORDER: MrVariableName[] = [
-  'YieldCurveInverted',
-  'InflationShock',
-  'LiquidityStress',
-  'CreditSpreadStress',
-  'VolatilityShock',
-  'DollarStrength',
-  'EquityRiskOn',
-  'AIRiskOn',
-]
+export type RegimeDomain = keyof typeof REGIMES
 
-type RegimeProbabilityMap = Record<MrVariableName, number>
-
-interface VariableProbabilityResponse {
-  target_variable: string
-  target_probability: number
-}
+type RegimeProbabilityMap = Record<string, number>
 
 async function fetchVariableProbabilities(
-  [, domain]: [string, Domain],
+  [, domain]: [string, RegimeDomain],
 ): Promise<RegimeProbabilityMap> {
   const entries = await Promise.all(
-    VAR_ORDER.map(async name => {
-      const res = await fetch(`${API_BASE}/v1/inference/query`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify({ domain, target_variable: name }),
-      })
-
-      if (!res.ok) throw new Error(`HTTP ${res.status}`)
-
-      const json = (await res.json()) as VariableProbabilityResponse
+    REGIMES[domain].variables.map(async ([name]) => {
+      const json = await queryInference({ domain, target_variable: name })
       if (typeof json.target_probability !== 'number') {
         throw new Error(`missing target_probability for ${name}`)
       }
@@ -59,16 +146,16 @@ async function fetchVariableProbabilities(
     }),
   )
 
-  return Object.fromEntries(entries) as RegimeProbabilityMap
+  return Object.fromEntries(entries)
 }
 
 interface Props {
-  domain: Domain
+  domain: RegimeDomain
 }
 
 export default function RegimeStatePanel({ domain }: Props) {
   const { data, error } = useSWR<RegimeProbabilityMap>(
-    ['mr-regime-probabilities', domain],
+    ['regime-probabilities', domain],
     fetchVariableProbabilities,
     { refreshInterval: POLL, revalidateOnFocus: false },
   )
@@ -91,7 +178,7 @@ export default function RegimeStatePanel({ domain }: Props) {
       <div className="panel-label has-tip">
         regime_state{data ? ' · current' : ' · loading…'}
         <div className="tip" style={{ left: 0, transform: 'none' }}>
-          Macro regime variables for the current evidence cycle. Each variable
+          {REGIMES[domain].name} regime variables for the current evidence cycle. Each variable
           shows the system&apos;s posterior state (TRUE/FALSE) and the probability
           assigned to that state. Variables near 0.50 are genuinely uncertain.
         </div>
@@ -102,7 +189,7 @@ export default function RegimeStatePanel({ domain }: Props) {
           <div style={{ color: 'var(--text-faint)', fontSize: 10 }}>loading…</div>
         )}
 
-        {data && VAR_ORDER.map(name => {
+        {data && REGIMES[domain].variables.map(([name, label]) => {
           const prob = data[name]
           const state = prob >= 0.5
 
@@ -118,7 +205,7 @@ export default function RegimeStatePanel({ domain }: Props) {
 
           return (
             <div key={name} className="regime-var-row">
-              <div className="regime-var-name">{VAR_LABELS[name]}</div>
+              <div className="regime-var-name">{label}</div>
 
               <div className={`regime-var-badge ${stateClass}`}>
                 {state ? 'TRUE' : 'FALSE'}
