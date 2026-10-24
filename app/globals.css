@@ -213,6 +213,10 @@ header {
 }
 
 .domain-tab {
+  appearance: none;
+  background: none;
+  font-family: inherit;
+  text-align: left;
   padding: 8px 20px;
   cursor: pointer;
   font-size: 11px;
@@ -228,6 +232,11 @@ header {
 }
 
 .domain-tab:hover { color: var(--text-dim); }
+
+.domain-tab:focus-visible {
+  outline: 1px solid var(--green);
+  outline-offset: -3px;
+}
 
 .domain-tab.active {
   color: var(--green);

@@ -500,6 +500,21 @@ export default function Dashboard() {
     }
   }
 
+  // Arrow keys, Home and End move between tabs, as in the WAI-ARIA tabs pattern.
+  function handleTabKey(e: React.KeyboardEvent<HTMLDivElement>) {
+    const i = DOMAINS.findIndex(d => d.key === active)
+    const next =
+      e.key === 'ArrowRight' ? (i + 1) % DOMAINS.length :
+      e.key === 'ArrowLeft' ? (i - 1 + DOMAINS.length) % DOMAINS.length :
+      e.key === 'Home' ? 0 :
+      e.key === 'End' ? DOMAINS.length - 1 :
+      null
+    if (next === null) return
+    e.preventDefault()
+    setActive(DOMAINS[next].key)
+    document.getElementById(`tab-${DOMAINS[next].key}`)?.focus()
+  }
+
   const fetchLabel =
     fetchState === 'fetching' ? '[ fetching... ]' :
     fetchState === 'failed' ? '[ fetch failed ]' :
@@ -612,25 +627,28 @@ export default function Dashboard() {
       </div>
 
       {/* ── Domain tabs ── */}
-      <div className="domain-tabs">
+      <div className="domain-tabs" role="tablist" aria-label="Domain" onKeyDown={handleTabKey}>
         {DOMAINS.map(d => (
-          <div
+          <button
             key={d.key}
+            id={`tab-${d.key}`}
+            type="button"
+            role="tab"
+            aria-selected={active === d.key}
+            aria-controls="domain-panel"
+            // Roving tabindex: Tab reaches the tab list once; arrows move within it.
+            tabIndex={active === d.key ? 0 : -1}
             className={`domain-tab ${active === d.key ? 'active' : ''}`}
             onClick={() => setActive(d.key)}
           >
             <span className="tab-ticker">{d.ticker}</span>
             {d.label}
-          </div>
+          </button>
         ))}
-        <div className="domain-tab" style={{ opacity: 0.3, cursor: 'not-allowed' }}>
-          <span className="tab-ticker">+</span>
-          add_domain
-        </div>
       </div>
 
       {/* ── Main grid ── */}
-      <div className="main-grid">
+      <div className="main-grid" id="domain-panel" role="tabpanel" aria-labelledby={`tab-${active}`}>
         {/*
           Only the active domain's panels are mounted. Mounting all eleven made
           every hidden tab fetch and poll too: about 240 requests on load, the
