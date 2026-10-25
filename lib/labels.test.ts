@@ -43,3 +43,7 @@ test('levelBadge names a graded signal by its most likely level', () => {
   assert.deepEqual(levelBadge('low'), { text: 'LOW', tone: 'low' })
   assert.throws(() => levelBadge('True'))
 })
+
+test('hypothesisLabel names a rival by the connection it puts in place of the leader\'s core', () => {
+  assert.equal(hypothesisLabel('rival_CreditSpreadStress_prev->LiquidityStress'), 'rival: CreditSpreadStress t-1 → LiquidityStress')
+})

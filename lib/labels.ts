@@ -15,9 +15,10 @@ export function variableLabel(variable: string): string {
 }
 
 // A hypothesis is named by the one edge it changes in its parent: one the
-// evidence prompted (added or turned round) or a blind variant (added or removed).
-const CHANGE = /^(?:prompted|variant)_(add|remove|reverse)_(.+)->(.+)$/
-const SYMBOL: Record<string, string> = { add: '+', remove: '−', reverse: '⇄' }
+// evidence prompted (added or turned round), a blind variant (added or
+// removed), or a rival's connection, put in place of the leader's core.
+const CHANGE = /^(?:(?:prompted|variant)_(add|remove|reverse)|(rival))_(.+)->(.+)$/
+const SYMBOL: Record<string, string> = { add: '+', remove: '−', reverse: '⇄', rival: 'rival:' }
 
 /**
  * "variant_add_A_prev->B" → "+ A t-1 → B", "variant_remove_A->B" → "− A → B",
@@ -27,8 +28,8 @@ const SYMBOL: Record<string, string> = { add: '+', remove: '−', reverse: '⇄'
 export function hypothesisLabel(name: string): string {
   const m = CHANGE.exec(name)
   if (!m) return name
-  const [, op, source, target] = m
-  return `${SYMBOL[op]} ${variableLabel(source)} → ${variableLabel(target)}`
+  const [, change, rival, source, target] = m
+  return `${SYMBOL[change ?? rival]} ${variableLabel(source)} → ${variableLabel(target)}`
 }
 
 /** hypothesisLabel without a description: "unconnected: …" → "unconnected". */
