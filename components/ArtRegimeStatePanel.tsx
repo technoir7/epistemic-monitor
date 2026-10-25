@@ -105,7 +105,8 @@ type ArtRegimeProbabilityMap = Record<ArtVariableName, number | null>
 
 interface VariableProbabilityResponse {
   target_variable: string
-  target_probability?: number | null
+  /** For art's yes/no signals, P(True) (engine D25). */
+  target_degree?: number | null
 }
 
 interface ArtRegimeState {
@@ -127,7 +128,7 @@ async function fetchArtVariableProbabilities(
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
 
       const json = (await res.json()) as VariableProbabilityResponse
-      const probability = json.target_probability
+      const probability = json.target_degree
 
       return [
         name,

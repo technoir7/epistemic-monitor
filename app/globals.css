@@ -1133,7 +1133,8 @@ header {
   transition: border-left-color 0.15s;
 }
 
-.regime-var-row:has(.state-true) {
+.regime-var-row:has(.state-true),
+.regime-var-row:has(.state-high) {
   border-left-color: var(--green-dark);
 }
 
@@ -1154,13 +1155,19 @@ header {
   letter-spacing: 0.05em;
 }
 
-.regime-var-badge.state-true  {
+.regime-var-badge.state-true,
+.regime-var-badge.state-high {
   color: var(--green);
   text-shadow: 0 0 6px rgba(0,255,65,0.35);
 }
 
-.regime-var-badge.state-false {
+.regime-var-badge.state-false,
+.regime-var-badge.state-low {
   color: var(--text-faint);
+}
+
+.regime-var-badge.state-mid {
+  color: var(--text-mid);
 }
 
 .regime-var-prob-wrap {

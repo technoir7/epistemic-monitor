@@ -62,7 +62,8 @@ export interface QueryRequest {
 export interface GraphNode {
   id: string
   label: string
-  probability?: number
+  /** The target's degree, 0 to 1: P(True) for a yes/no, mean level for a graded signal. */
+  degree?: number | null
   /** For observed/given nodes (e.g. "↓2.1σ") */
   observation?: string
   status: 'established' | 'exploring' | 'weak' | 'target'
@@ -87,7 +88,11 @@ export interface FrontierEdge {
 export interface InferenceResponse {
   candidate_id: string
   target_variable: string
-  target_probability: number
+  /** Most likely value: a level (low/mid/high) or "True"/"False" for a yes/no. */
+  target_level: string | null
+  /** 0 to 1: P(True) for a yes/no, mean position from low to high for levels (engine D25). */
+  target_degree: number | null
+  target_distribution: Record<string, number>
   nodes: GraphNode[]
   edges: GraphEdge[]
   frontier_edges: FrontierEdge[]

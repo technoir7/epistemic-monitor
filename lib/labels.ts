@@ -40,3 +40,16 @@ export function hypothesisShortLabel(name: string): string {
 export function shortId(id: string): string {
   return id.slice(0, 8)
 }
+
+export type LevelTone = 'high' | 'mid' | 'low'
+const LEVEL_TONES: readonly string[] = ['high', 'mid', 'low']
+
+/**
+ * A graded signal's most likely level (engine D25: low, mid or high, how far
+ * the measure lies from the line that names it) as a badge. Anything else is
+ * a contract break, not a level to guess at.
+ */
+export function levelBadge(level: string): { text: string; tone: LevelTone } {
+  if (!LEVEL_TONES.includes(level)) throw new Error(`not a level: ${level}`)
+  return { text: level.toUpperCase(), tone: level as LevelTone }
+}

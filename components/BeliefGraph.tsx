@@ -238,13 +238,13 @@ export default function BeliefGraph({ domain, targetVariable = 'price_up' }: Pro
         .attr('stroke-dasharray', d => d.status === 'exploring' ? '4,3' : null)
 
       const secondLine = (d: SimNode): string => {
-        if (d.status === 'target' && d.probability != null) return d.probability.toFixed(2)
+        if (d.status === 'target' && d.degree != null) return d.degree.toFixed(2)
         if (d.observation) return d.observation
-        if (d.probability != null) return `p=${d.probability.toFixed(2)}`
+        if (d.degree != null) return d.degree.toFixed(2)
         if (d.status === 'exploring') return 'exploring'
         return ''
       }
-      const isTargetValue = (d: SimNode) => d.status === 'target' && d.probability != null
+      const isTargetValue = (d: SimNode) => d.status === 'target' && d.degree != null
 
       // Line 1: the variable. Centred alone, raised when a second line follows.
       nodeGroups.append('text')

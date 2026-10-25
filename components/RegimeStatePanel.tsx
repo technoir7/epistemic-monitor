@@ -3,6 +3,7 @@
 import useSWR from 'swr'
 import type { Domain } from '@/lib/types'
 import { queryInference } from '@/lib/api'
+import { levelBadge } from '@/lib/labels'
 
 const POLL = 30_000
 
@@ -130,19 +131,20 @@ const REGIMES = {
 
 export type RegimeDomain = keyof typeof REGIMES
 
-type RegimeProbabilityMap = Record<string, number>
+// Each signal's most likely level and its degree from 0 (low) to 1 (high):
+// how far the measure lies from its line (engine D25), not a probability.
+type RegimeReadings = Record<string, { level: string; degree: number }>
 
-async function fetchVariableProbabilities(
+async function fetchReadings(
   [, domain]: [string, RegimeDomain],
-): Promise<RegimeProbabilityMap> {
+): Promise<RegimeReadings> {
   const entries = await Promise.all(
     REGIMES[domain].variables.map(async ([name]) => {
       const json = await queryInference({ domain, target_variable: name })
-      if (typeof json.target_probability !== 'number') {
-        throw new Error(`missing target_probability for ${name}`)
+      if (typeof json.target_degree !== 'number' || typeof json.target_level !== 'string') {
+        throw new Error(`missing reading for ${name}`)
       }
-
-      return [name, json.target_probability] as const
+      return [name, { level: json.target_level, degree: json.target_degree }] as const
     }),
   )
 
@@ -154,9 +156,9 @@ interface Props {
 }
 
 export default function RegimeStatePanel({ domain }: Props) {
-  const { data, error } = useSWR<RegimeProbabilityMap>(
-    ['regime-probabilities', domain],
-    fetchVariableProbabilities,
+  const { data, error } = useSWR<RegimeReadings>(
+    ['regime-readings', domain],
+    fetchReadings,
     { refreshInterval: POLL, revalidateOnFocus: false },
   )
 
@@ -178,9 +180,10 @@ export default function RegimeStatePanel({ domain }: Props) {
       <div className="panel-label has-tip">
         regime_state{data ? ' · current' : ' · loading…'}
         <div className="tip" style={{ left: 0, transform: 'none' }}>
-          {REGIMES[domain].name} regime variables for the current evidence cycle. Each variable
-          shows the system&apos;s posterior state (TRUE/FALSE) and the probability
-          assigned to that state. Variables near 0.50 are genuinely uncertain.
+          {REGIMES[domain].name} signals for the current evidence cycle. Each is read as
+          LOW, MID or HIGH: how far its measure lies from the line that names it. The bar
+          is the system&apos;s degree, from 0 (surely low) to 1 (surely high), averaged over
+          what it believes; 0.50 can mean surely middling or unsure between low and high.
         </div>
       </div>
 
@@ -190,36 +193,32 @@ export default function RegimeStatePanel({ domain }: Props) {
         )}
 
         {data && REGIMES[domain].variables.map(([name, label]) => {
-          const prob = data[name]
-          const state = prob >= 0.5
-
-          // Colour-code by state and confidence
-          const stateClass = state ? 'state-true' : 'state-false'
-          const isHighConf = prob >= 0.70
-          const fillClass  = state
-            ? (isHighConf ? 'regime-prob-fill--true-hi' : 'regime-prob-fill--true-lo')
-            : 'regime-prob-fill--false'
-          const probColor  = state
-            ? (isHighConf ? 'var(--green)' : 'var(--text-mid)')
-            : 'var(--text-faint)'
+          const { level, degree } = data[name]
+          const badge = levelBadge(level)
+          const fillClass = {
+            high: 'regime-prob-fill--true-hi', mid: 'regime-prob-fill--true-lo', low: 'regime-prob-fill--false',
+          }[badge.tone]
+          const degreeColor = {
+            high: 'var(--green)', mid: 'var(--text-mid)', low: 'var(--text-faint)',
+          }[badge.tone]
 
           return (
             <div key={name} className="regime-var-row">
               <div className="regime-var-name">{label}</div>
 
-              <div className={`regime-var-badge ${stateClass}`}>
-                {state ? 'TRUE' : 'FALSE'}
+              <div className={`regime-var-badge state-${badge.tone}`}>
+                {badge.text}
               </div>
 
               <div className="regime-var-prob-wrap">
                 <div className="regime-prob-track">
                   <div
                     className={`regime-prob-fill ${fillClass}`}
-                    style={{ width: `${(prob * 100).toFixed(0)}%` }}
+                    style={{ width: `${(degree * 100).toFixed(0)}%` }}
                   />
                 </div>
-                <div className="regime-prob-num" style={{ color: probColor }}>
-                  {prob.toFixed(2)}
+                <div className="regime-prob-num" style={{ color: degreeColor }}>
+                  {degree.toFixed(2)}
                 </div>
               </div>
             </div>
