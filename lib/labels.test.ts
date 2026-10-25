@@ -47,3 +47,8 @@ test('levelBadge names a graded signal by its most likely level', () => {
 test('hypothesisLabel names a rival by the connection it puts in place of the leader\'s core', () => {
   assert.equal(hypothesisLabel('rival_CreditSpreadStress_prev->LiquidityStress'), 'rival: CreditSpreadStress t-1 → LiquidityStress')
 })
+
+test('hypothesisLabel names a trial by the core it goes without', () => {
+  assert.equal(hypothesisLabel('trial_InflationShock->CreditSpreadStress'), 'without: InflationShock → CreditSpreadStress')
+  assert.equal(hypothesisShortLabel('trial_InflationShock->CreditSpreadStress'), 'without: InflationShock → CreditSpreadStress')
+})
