@@ -17,7 +17,7 @@ const TARGET_VARIABLE_BY_DOMAIN: Record<Domain, string> = {
   cr: 'BTCMomentumPositive',
   gp: 'ConflictIntensityElevated',
   sf: 'TechHiringAccelerating',
-  art: 'CraftPrestigeRising',
+  art: 'NYTMuseumsTalk',
 }
 
 interface Props {

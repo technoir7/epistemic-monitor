@@ -137,34 +137,6 @@ export interface EvidenceResponse {
   records: EvidenceRecord[]
 }
 
-// ─── POST /v1/inference/query → ArtRegimeStatePanel ──────────────────────────
-export type ArtVariableName =
-  | 'InstitutionalRiskAversion'
-  | 'MuseumFigurativeAcceptance'
-  | 'ConceptualDominance'
-  | 'AIArtInstitutionalAcceptance'
-  | 'CuratorialMaterialityShift'
-  | 'CraftPrestigeRising'
-  | 'PrestigeFragmentation'
-  | 'RegionalSceneMomentum'
-  | 'BlueChipInstitutionalCapture'
-  | 'BiennialFatigue'
-  | 'MuseumAcquisitionMomentum'
-  | 'BlueChipConcentration'
-  | 'AuctionSpeculationElevated'
-  | 'CollectorFlightToSafety'
-  | 'FigurativeAuctionMomentum'
-  | 'EmergingMarketLiquidity'
-  | 'MarketPolarization'
-  | 'MarketUncertainty'
-  | 'RitualAuraPremium'
-  | 'EmbodimentDiscourseRising'
-  | 'AntiDigitalSentiment'
-  | 'AIImageSaturation'
-  | 'AuthenticityPremium'
-  | 'NeoAcademicResurgence'
-  | 'AttentionFragmentation'
-
 // ─── GET /v1/debug/entropy → console diagnostics ────────────────────────────
 export interface VariableEntropyDebug {
   value_counts: Record<string, number>

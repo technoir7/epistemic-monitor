@@ -14,7 +14,6 @@ import ExplorationFrontier from '@/components/ExplorationFrontier'
 import DomainReport        from '@/components/DomainReport'
 import PromptLine          from '@/components/PromptLine'
 import RegimeStatePanel    from '@/components/RegimeStatePanel'
-import ArtRegimeStatePanel from '@/components/ArtRegimeStatePanel'
 
 const DOMAINS: { key: Domain; ticker: string; label: string }[] = [
   { key: 'mr', ticker: 'MR', label: 'macro_regime' },
@@ -168,31 +167,19 @@ const VARIABLE_DEFINITIONS_BY_DOMAIN: Record<Domain, string> = {
   "StartupFormationRising" = new business registrations are accelerating, signaling economic optimism and entrepreneur confidence
   "FootTrafficRecovering" = hospitality and retail employment is recovering toward pre-downturn levels, people are returning to the city
   "PopulationFlowPositive" = San Francisco's overall employment base is growing, suggesting net population inflow and retention`,
-  art: `  "InstitutionalRiskAversion" = museums, galleries, and major curators are avoiding reputationally risky bets
-  "MuseumFigurativeAcceptance" = figurative work is receiving stronger institutional validation
-  "ConceptualDominance" = concept-led and theory-heavy practices still define institutional taste
-  "AIArtInstitutionalAcceptance" = AI-generated or AI-assisted art is gaining museum and curatorial legitimacy
-  "CuratorialMaterialityShift" = curators are placing more weight on physical process, craft, and material presence
-  "CraftPrestigeRising" = handmade, labor-intensive, or technically demanding work is gaining prestige
-  "PrestigeFragmentation" = authority is spread across regional scenes, online publics, fairs, and institutions rather than concentrated in a single center
-  "RegionalSceneMomentum" = non-core art scenes are gaining critical attention and market energy
-  "BlueChipInstitutionalCapture" = established artists and galleries are absorbing institutional attention
-  "BiennialFatigue" = appetite for large recurring survey exhibitions is weakening
-  "MuseumAcquisitionMomentum" = museum buying or collection activity is accelerating
-  "BlueChipConcentration" = market demand is concentrated in established artists and galleries
-  "AuctionSpeculationElevated" = auction activity reflects speculative bidding rather than stable collecting
-  "CollectorFlightToSafety" = collectors are favoring proven artists and assets over emerging risk
-  "FigurativeAuctionMomentum" = figurative work is strengthening in auction results
-  "EmergingMarketLiquidity" = buyers are actively trading emerging artists rather than only watching from the sidelines
-  "MarketPolarization" = strong artists are separating sharply from weaker market segments
-  "MarketUncertainty" = pricing, demand, and resale confidence are unstable
-  "RitualAuraPremium" = buyers and institutions value physical presence, ritual, and aura more highly
-  "EmbodimentDiscourseRising" = critical language around bodies, touch, presence, and lived experience is gaining force
-  "AntiDigitalSentiment" = cultural reaction against screen-based or purely digital work is strengthening
-  "AIImageSaturation" = AI-generated imagery is abundant enough to reduce novelty and increase fatigue
-  "AuthenticityPremium" = audiences and collectors place greater value on provenance, authorship, and visible human agency
-  "NeoAcademicResurgence" = formal training, draughtsmanship, and academic technique are regaining status
-  "AttentionFragmentation" = audience and collector attention is split across many channels, styles, and scenes`,
+  art: `  "GuardianPhotographyTalk" = how much of the Guardian's art coverage this month is tagged photography, against the two years before
+  "GuardianExhibitionTalk" = how much of the Guardian's art coverage is tagged exhibition (reviews and news of shows)
+  "GuardianPaintingTalk" = how much of the Guardian's art coverage is tagged painting
+  "GuardianArchitectureTalk" = how much of the Guardian's art coverage is tagged architecture
+  "NYTMuseumsTalk" = how much of the New York Times' art coverage is tagged museums
+  "NYTPhotographyTalk" = how much of the New York Times' art coverage is tagged photography
+  "NYTSculptureTalk" = how much of the New York Times' art coverage is tagged sculpture
+  "NYTAuctionsTalk" = how much of the New York Times' art coverage is tagged auctions
+  "ArtSalesGrowth" = the change in global art sales over the year, from the Art Basel & UBS report, against earlier years
+  "DealerShare" = dealers' share of art sales, against auction houses
+  "OnlineShare" = the online share of all art sales
+  "HighEndShare" = the share of fine-art auction value from works sold for over $10 million
+  "MuseumAcquisitionMomentum" = how many distinct artists the Art Institute of Chicago and the Cleveland Museum of Art acquired in a year, against their own pasts`,
 }
 
 function snapshotPromptForDomain(domain: Domain) {
@@ -255,7 +242,7 @@ const GRAPH_TARGET: Record<Exclude<Domain, 'ng'>, string> = {
   cr: 'BTCMomentumPositive',
   gp: 'ConflictIntensityElevated',
   sf: 'TechHiringAccelerating',
-  art: 'CraftPrestigeRising',
+  art: 'NYTMuseumsTalk',
 }
 
 // Every other domain: status, graph, regime variables, population, history.
@@ -264,9 +251,7 @@ function RegimePanels({ domain }: { domain: Exclude<Domain, 'ng'> }) {
     <>
       <EpistemicStateBar domain={domain} />
       <BeliefGraph domain={domain} targetVariable={GRAPH_TARGET[domain]} />
-      {domain === 'art'
-        ? <ArtRegimeStatePanel domain="art" />
-        : <RegimeStatePanel domain={domain} />}
+      <RegimeStatePanel domain={domain} />
       <OntologyPopulation domain={domain} />
       <ParadigmShiftTimeline domain={domain} />
       <ExplorationFrontier domain={domain} />

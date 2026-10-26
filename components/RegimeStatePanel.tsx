@@ -8,7 +8,7 @@ import { levelBadge } from '@/lib/labels'
 const POLL = 30_000
 
 // The regime variables each domain shows, in display order, with the short
-// label for the row. Art has its own panel: grouped variables, nullable values.
+// label for the row.
 const REGIMES = {
   mr: {
     name: 'Macro',
@@ -125,6 +125,24 @@ const REGIMES = {
       ['StartupFormationRising', 'STARTUP_FORM_RIS'],
       ['FootTrafficRecovering',  'FOOT_TRAFFIC_REC'],
       ['PopulationFlowPositive', 'POP_FLOW_POS'],
+    ],
+  },
+  art: {
+    name: 'Art',
+    variables: [
+      ['GuardianPhotographyTalk',   'GDN_PHOTOGRAPHY'],
+      ['GuardianExhibitionTalk',    'GDN_EXHIBITION'],
+      ['GuardianPaintingTalk',      'GDN_PAINTING'],
+      ['GuardianArchitectureTalk',  'GDN_ARCHITECTURE'],
+      ['NYTMuseumsTalk',            'NYT_MUSEUMS'],
+      ['NYTPhotographyTalk',        'NYT_PHOTOGRAPHY'],
+      ['NYTSculptureTalk',          'NYT_SCULPTURE'],
+      ['NYTAuctionsTalk',           'NYT_AUCTIONS'],
+      ['ArtSalesGrowth',            'SALES_GROWTH'],
+      ['DealerShare',               'DEALER_SHARE'],
+      ['OnlineShare',               'ONLINE_SHARE'],
+      ['HighEndShare',              'HIGH_END_SHARE'],
+      ['MuseumAcquisitionMomentum', 'MUSEUM_ACQUISITIONS'],
     ],
   },
 } satisfies Partial<Record<Domain, { name: string; variables: [string, string][] }>>
