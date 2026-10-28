@@ -9,6 +9,7 @@ import type {
   EntropyDebugResponse,
   DomainReport,
   DomainReportEmpty,
+  CasesResponse,
 } from './types'
 
 const API_BASE =
@@ -89,6 +90,12 @@ export async function fetchRecentEvidence(
 
 export async function fetchEntropyDebug(domain: Domain): Promise<EntropyDebugResponse> {
   return get(`/v1/debug/entropy?domain=${q(domain)}`)
+}
+
+export async function fetchCases(
+  [, domain]: [string, Domain],
+): Promise<CasesResponse> {
+  return get(`/v1/cases?domain=${q(domain)}`)
 }
 
 // ─── Reports ─────────────────────────────────────────────────────────────────

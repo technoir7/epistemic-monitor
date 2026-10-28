@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { hypothesisLabel, hypothesisShortLabel, isLagged, levelBadge, shortId, variableLabel } from './labels.ts'
+import { anyChance, hypothesisLabel, hypothesisShortLabel, isLagged, levelBadge, mechanismLabel, shortId, variableLabel } from './labels.ts'
 
 test('variableLabel shows last week as t-1', () => {
   assert.equal(variableLabel('CreditSpreadStress_prev'), 'CreditSpreadStress t-1')
@@ -51,4 +51,18 @@ test('hypothesisLabel names a rival by the connection it puts in place of the le
 test('hypothesisLabel names a trial by the core it goes without', () => {
   assert.equal(hypothesisLabel('trial_InflationShock->CreditSpreadStress'), 'without: InflationShock → CreditSpreadStress')
   assert.equal(hypothesisShortLabel('trial_InflationShock->CreditSpreadStress'), 'without: InflationShock → CreditSpreadStress')
+})
+
+test('mechanismLabel names a set of mechanisms in words, own past when empty', () => {
+  assert.equal(mechanismLabel([]), 'own past alone')
+  assert.equal(mechanismLabel(['nyt']), 'NYT coverage')
+  assert.equal(mechanismLabel(['nyt', 'contested']), 'NYT coverage + contested')
+  assert.equal(mechanismLabel(['something_new']), 'something_new')
+})
+
+test('anyChance is the chance of one or more, as a whole percent', () => {
+  assert.equal(anyChance([0.5, 0.06, 0.44]), '50%')
+  assert.equal(anyChance([0.994, 0.003, 0.003]), '1%')
+  assert.equal(anyChance([0.004, 0, 0.996]), '>99%')
+  assert.equal(anyChance([0.996, 0.004, 0]), '<1%')
 })

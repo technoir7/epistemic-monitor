@@ -12,6 +12,7 @@ import EvidenceStream      from '@/components/EvidenceStream'
 import ParadigmShiftTimeline from '@/components/ParadigmShiftTimeline'
 import ExplorationFrontier from '@/components/ExplorationFrontier'
 import DomainReport        from '@/components/DomainReport'
+import CaseMechanisms      from '@/components/CaseMechanisms'
 import PromptLine          from '@/components/PromptLine'
 import RegimeStatePanel    from '@/components/RegimeStatePanel'
 
@@ -508,6 +509,11 @@ export default function Dashboard() {
           rather than being capped at the 88px grid-auto-row.
         */}
         {active === 'ng' ? <NgPanels /> : <RegimePanels key={active} domain={active} />}
+      </div>
+
+      {/* Case mechanisms: outside the grid for the same reason as the report. */}
+      <div className="cases-section">
+        <CaseMechanisms key={active} domain={active} />
       </div>
 
       {/*

@@ -184,3 +184,43 @@ export interface DomainReportEmpty {
   domain: string
 }
 
+
+// ─── GET /v1/cases → case mechanisms (engine REFACTOR_SPEC D29) ─────────────
+export interface CaseShift {
+  year: number            // the year whose evidence made the change
+  frm: string[]
+  to: string[]
+}
+
+export interface CaseYear {
+  year: number
+  engine: number          // nats: log score of the leader chosen before the year
+  own_past: number
+  cases: number
+}
+
+export interface CaseForecast {
+  case: string
+  label: string
+  own_past: number[]      // chance of none, one, several
+  with_leader: number[]
+}
+
+export interface CaseSet {
+  key: string
+  title: string
+  outcome: string
+  pool: string[]
+  leader: string[]        // empty: own past alone
+  shifts: CaseShift[]
+  years: CaseYear[]
+  gain: number
+  forecast_year: number | null   // the state year; the forecast is for the year after
+  likeliest: CaseForecast[]
+  most_raised: CaseForecast[]
+}
+
+export interface CasesResponse {
+  domain: string
+  case_sets: CaseSet[]
+}

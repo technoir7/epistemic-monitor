@@ -1408,3 +1408,78 @@ header {
     font-size: 10px;
   }
 }
+
+/* ── Case mechanisms (below the grid, natural height) ── */
+.cases-section {
+  margin-top: 8px;
+}
+
+.cases-sets {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.cases-title {
+  font-family: var(--font-vt323), 'VT323', monospace;
+  font-size: 20px;
+  color: var(--text);
+}
+
+.cases-line {
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-top: 4px;
+}
+
+.cases-bars {
+  display: flex;
+  gap: 2px;
+  height: 40px;
+  margin: 8px 0;
+  border-bottom: 1px solid var(--green-faint);
+}
+
+.cases-bar-slot {
+  flex: 1;
+  position: relative;
+}
+
+.cases-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+}
+
+.cases-forecasts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.cases-list-title {
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 4px;
+}
+
+.cases-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 6px;
+  font-size: 10px;
+  color: var(--text-dim);
+}
+
+.cases-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+  .cases-sets, .cases-forecasts { grid-template-columns: 1fr; }
+}
