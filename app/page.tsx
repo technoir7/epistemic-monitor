@@ -6,6 +6,7 @@ import type { Domain } from '@/lib/types'
 import { fetchEntropyDebug, triggerIngest } from '@/lib/api'
 import EpistemicStateBar   from '@/components/EpistemicStateBar'
 import BeliefGraph         from '@/components/BeliefGraph'
+import CaseGraph           from '@/components/CaseGraph'
 import OntologyPopulation  from '@/components/OntologyPopulation'
 import EdgeExistencePanel  from '@/components/EdgeExistencePanel'
 import EvidenceStream      from '@/components/EvidenceStream'
@@ -232,7 +233,8 @@ function NgPanels() {
   )
 }
 
-// Variable each regime domain's belief graph asks about.
+// Variable each regime domain's belief graph asks about; 'cases' draws the
+// case mechanisms instead (art: its monthly totals carry no links).
 const GRAPH_TARGET: Record<Exclude<Domain, 'ng'>, string> = {
   mr: 'AIRiskOn',
   ai: 'SemiconductorMomentum',
@@ -243,7 +245,7 @@ const GRAPH_TARGET: Record<Exclude<Domain, 'ng'>, string> = {
   cr: 'BTCMomentumPositive',
   gp: 'ConflictIntensityElevated',
   sf: 'TechHiringAccelerating',
-  art: 'NYTMuseumsTalk',
+  art: 'cases',
 }
 
 // Every other domain: status, graph, regime variables, population, history.
@@ -251,7 +253,9 @@ function RegimePanels({ domain }: { domain: Exclude<Domain, 'ng'> }) {
   return (
     <>
       <EpistemicStateBar domain={domain} />
-      <BeliefGraph domain={domain} targetVariable={GRAPH_TARGET[domain]} />
+      {GRAPH_TARGET[domain] === 'cases'
+        ? <CaseGraph domain={domain} />
+        : <BeliefGraph domain={domain} targetVariable={GRAPH_TARGET[domain]} />}
       <RegimeStatePanel domain={domain} />
       <OntologyPopulation domain={domain} />
       <ParadigmShiftTimeline domain={domain} />

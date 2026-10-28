@@ -74,16 +74,11 @@ function CaseSetView({ set }: { set: CaseSet }) {
         </div>
       )}
       {set.forecast_year !== null && (
-        <div className="cases-forecasts">
+        <div style={{ marginTop: 8 }}>
           <ForecastList
             title={`raised most by ${leader}, ${set.forecast_year + 1}`}
             rows={set.most_raised}
             empty="the leader is own past: it raises no one"
-          />
-          <ForecastList
-            title={`likeliest, ${set.forecast_year + 1} (mostly own past)`}
-            rows={set.likeliest}
-            empty="none"
           />
         </div>
       )}

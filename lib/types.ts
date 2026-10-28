@@ -199,6 +199,11 @@ export interface CaseYear {
   cases: number
 }
 
+export interface CaseMechanism {
+  features: string[]
+  gain: number            // nats over own past, all scored years
+}
+
 export interface CaseForecast {
   case: string
   label: string
@@ -215,8 +220,8 @@ export interface CaseSet {
   shifts: CaseShift[]
   years: CaseYear[]
   gain: number
+  mechanisms: CaseMechanism[]    // every rival set of mechanisms, best first
   forecast_year: number | null   // the state year; the forecast is for the year after
-  likeliest: CaseForecast[]
   most_raised: CaseForecast[]
 }
 

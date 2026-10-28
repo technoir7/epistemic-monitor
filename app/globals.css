@@ -1451,13 +1451,6 @@ header {
   right: 0;
 }
 
-.cases-forecasts {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-top: 8px;
-}
-
 .cases-list-title {
   font-size: 9px;
   letter-spacing: 0.12em;
@@ -1481,5 +1474,5 @@ header {
 }
 
 @media (max-width: 900px) {
-  .cases-sets, .cases-forecasts { grid-template-columns: 1fr; }
+  .cases-sets { grid-template-columns: 1fr; }
 }
