@@ -7,13 +7,16 @@ import { fetchEntropyDebug, triggerIngest } from '@/lib/api'
 import EpistemicStateBar   from '@/components/EpistemicStateBar'
 import BeliefGraph         from '@/components/BeliefGraph'
 import CaseGraph           from '@/components/CaseGraph'
+import CaseStateBar        from '@/components/CaseStateBar'
+import CaseRivals          from '@/components/CaseRivals'
+import CaseForecasts       from '@/components/CaseForecasts'
+import CaseShifts          from '@/components/CaseShifts'
 import OntologyPopulation  from '@/components/OntologyPopulation'
 import EdgeExistencePanel  from '@/components/EdgeExistencePanel'
 import EvidenceStream      from '@/components/EvidenceStream'
 import ParadigmShiftTimeline from '@/components/ParadigmShiftTimeline'
 import ExplorationFrontier from '@/components/ExplorationFrontier'
 import DomainReport        from '@/components/DomainReport'
-import CaseMechanisms      from '@/components/CaseMechanisms'
 import PromptLine          from '@/components/PromptLine'
 import RegimeStatePanel    from '@/components/RegimeStatePanel'
 
@@ -233,9 +236,8 @@ function NgPanels() {
   )
 }
 
-// Variable each regime domain's belief graph asks about; 'cases' draws the
-// case mechanisms instead (art: its monthly totals carry no links).
-const GRAPH_TARGET: Record<Exclude<Domain, 'ng'>, string> = {
+// Variable each regime domain's belief graph asks about.
+const GRAPH_TARGET: Record<Exclude<Domain, 'ng' | 'art'>, string> = {
   mr: 'AIRiskOn',
   ai: 'SemiconductorMomentum',
   sd: 'USYieldSpiking',
@@ -245,17 +247,31 @@ const GRAPH_TARGET: Record<Exclude<Domain, 'ng'>, string> = {
   cr: 'BTCMomentumPositive',
   gp: 'ConflictIntensityElevated',
   sf: 'TechHiringAccelerating',
-  art: 'cases',
+}
+
+// Art is judged by cases (engine D29): its monthly totals carry no links, so
+// the case engine takes the slots of the status, graph, population, history
+// and frontier; the current monthly signals stay, as the engine's input.
+function CasePanels({ domain }: { domain: Exclude<Domain, 'ng'> }) {
+  return (
+    <>
+      <CaseStateBar domain={domain} />
+      <CaseGraph domain={domain} />
+      <RegimeStatePanel domain={domain} />
+      <CaseRivals domain={domain} />
+      <CaseForecasts domain={domain} />
+      <CaseShifts domain={domain} />
+      <PromptLine domain={domain} />
+    </>
+  )
 }
 
 // Every other domain: status, graph, regime variables, population, history.
-function RegimePanels({ domain }: { domain: Exclude<Domain, 'ng'> }) {
+function RegimePanels({ domain }: { domain: Exclude<Domain, 'ng' | 'art'> }) {
   return (
     <>
       <EpistemicStateBar domain={domain} />
-      {GRAPH_TARGET[domain] === 'cases'
-        ? <CaseGraph domain={domain} />
-        : <BeliefGraph domain={domain} targetVariable={GRAPH_TARGET[domain]} />}
+      <BeliefGraph domain={domain} targetVariable={GRAPH_TARGET[domain]} />
       <RegimeStatePanel domain={domain} />
       <OntologyPopulation domain={domain} />
       <ParadigmShiftTimeline domain={domain} />
@@ -512,12 +528,9 @@ export default function Dashboard() {
           .report-section so its natural height contributes to document scroll height
           rather than being capped at the 88px grid-auto-row.
         */}
-        {active === 'ng' ? <NgPanels /> : <RegimePanels key={active} domain={active} />}
-      </div>
-
-      {/* Case mechanisms: outside the grid for the same reason as the report. */}
-      <div className="cases-section">
-        <CaseMechanisms key={active} domain={active} />
+        {active === 'ng' ? <NgPanels />
+          : active === 'art' ? <CasePanels key={active} domain={active} />
+          : <RegimePanels key={active} domain={active} />}
       </div>
 
       {/*

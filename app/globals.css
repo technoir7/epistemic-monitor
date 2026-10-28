@@ -1409,34 +1409,18 @@ header {
   }
 }
 
-/* ── Case mechanisms (below the grid, natural height) ── */
-.cases-section {
-  margin-top: 8px;
-}
-
-.cases-sets {
+/* ── Case panels (art; engine D29) ── */
+.cases-columns {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
 }
 
-.cases-title {
-  font-family: var(--font-vt323), 'VT323', monospace;
-  font-size: 20px;
-  color: var(--text);
-}
-
-.cases-line {
-  font-size: 11px;
-  color: var(--text-dim);
-  margin-top: 4px;
-}
-
 .cases-bars {
   display: flex;
   gap: 2px;
-  height: 40px;
-  margin: 8px 0;
+  height: 36px;
+  margin: 4px 0 10px;
   border-bottom: 1px solid var(--green-faint);
 }
 
@@ -1473,6 +1457,34 @@ header {
   white-space: nowrap;
 }
 
+.rival-row {
+  display: grid;
+  grid-template-columns: 1fr 60px 34px;
+  gap: 6px;
+  align-items: center;
+  font-size: 10px;
+  margin-bottom: 3px;
+}
+
+.rival-bar {
+  position: relative;
+  height: 6px;
+  border-left: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+}
+
+.rival-bar > span {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+}
+
+.cases-shift-line {
+  font-size: 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 @media (max-width: 900px) {
-  .cases-sets { grid-template-columns: 1fr; }
+  .cases-columns { grid-template-columns: 1fr; }
 }

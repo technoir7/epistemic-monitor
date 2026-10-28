@@ -17,7 +17,7 @@ const QUERY: Record<Domain, string> = {
   cr: 'query --domain cr --target BTCMomentumPositive --condition StablecoinFlowPositive=true --aggregation weighted_avg',
   gp: 'query --domain gp --target ConflictIntensityElevated --condition TradeDisruptionRisk=true --aggregation weighted_avg',
   sf: 'query --domain sf --target TechHiringAccelerating --condition StartupFormationRising=true --aggregation weighted_avg',
-  art: 'query --domain art --target NYTMuseumsTalk --condition NYTAuctionsTalk=high --aggregation weighted_avg',
+  art: 'cases --domain art --sets artists,concepts --rivals all --against own_past',
 }
 
 export default function PromptLine({ domain }: Props) {
