@@ -11,7 +11,8 @@ import type {
   DomainReportEmpty,
   CasesResponse,
   TrendsResponse,
-  TrendListName,
+  SubReport,
+  SuccessResponse,
 } from './types'
 
 const API_BASE =
@@ -108,18 +109,24 @@ export async function fetchTrends(
 
 // ─── Reports ─────────────────────────────────────────────────────────────────
 
-// A domain's report, or with LIST one of its trend lists' reports (engine D30).
-function reportPath(domain: Domain, list?: TrendListName): string {
-  return list ? `/v1/trends/${q(domain)}/${q(list)}/report` : `/v1/report/${q(domain)}`
+// A domain's report, or one of its sub-reports (engine D30, D31).
+function reportPath(domain: Domain, sub?: SubReport): string {
+  return sub ? `/v1/${sub.section}/${q(domain)}/${q(sub.name)}/report` : `/v1/report/${q(domain)}`
 }
 
 export async function fetchCachedReport(
-  [, domain, list]: [string, Domain, TrendListName?],
+  [, domain, section, name]: [string, Domain, string?, string?],
 ): Promise<DomainReport | DomainReportEmpty> {
   // The engine answers {found: false} when nothing is cached yet.
-  return get(reportPath(domain, list))
+  return get(reportPath(domain, section ? { section, name } as SubReport : undefined))
 }
 
-export async function refreshReport(domain: Domain, list?: TrendListName): Promise<DomainReport> {
-  return post(`${reportPath(domain, list)}/refresh`)
+export async function refreshReport(domain: Domain, sub?: SubReport): Promise<DomainReport> {
+  return post(`${reportPath(domain, sub)}/refresh`)
+}
+
+export async function fetchSuccess(
+  [, domain]: [string, Domain],
+): Promise<SuccessResponse> {
+  return get(`/v1/success?domain=${q(domain)}`)
 }

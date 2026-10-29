@@ -2,14 +2,14 @@
 
 import { useState } from 'react'
 import useSWR from 'swr'
-import type { Domain, DomainReport as DomainReportType, DomainReportEmpty, TrendListName } from '@/lib/types'
+import type { Domain, DomainReport as DomainReportType, DomainReportEmpty, SubReport } from '@/lib/types'
 import { fetchCachedReport, refreshReport } from '@/lib/api'
 import { reportBlocks } from '@/lib/report'
-import { TREND_LIST } from '@/lib/labels'
 
 interface Props {
   domain: Domain
-  list?: TrendListName      // one of the domain's trend lists (engine D30), instead of the domain
+  sub?: SubReport           // a trend list's (D30) or a kind of success's (D31) report, instead of the domain's
+  title?: string            // the sub-report's name, for its label
 }
 
 function formatTs(iso: string): string {
@@ -42,14 +42,14 @@ function ReportBody({ text }: { text: string }) {
   )
 }
 
-export default function DomainReport({ domain, list }: Props) {
+export default function DomainReport({ domain, sub, title }: Props) {
   const [refreshing, setRefreshing] = useState(false)
   const [refreshError, setRefreshError] = useState<string | null>(null)
 
   // Load cached report on mount. No polling — SWR key just fetches once
   // and we manually mutate after a successful refresh.
   const { data, error: loadError, mutate, isLoading } = useSWR<DomainReportType | DomainReportEmpty>(
-    ['domain-report', domain, list],
+    ['domain-report', domain, sub?.section, sub?.name],
     fetchCachedReport,
     { revalidateOnFocus: false, refreshInterval: 0 },
   )
@@ -61,7 +61,7 @@ export default function DomainReport({ domain, list }: Props) {
     setRefreshing(true)
     setRefreshError(null)
     try {
-      const fresh = await refreshReport(domain, list)
+      const fresh = await refreshReport(domain, sub)
       // Update SWR cache so the UI reflects the new report immediately.
       await mutate(fresh, { revalidate: false })
     } catch (err) {
@@ -79,7 +79,7 @@ export default function DomainReport({ domain, list }: Props) {
       {/* Header row: label + metadata + button */}
       <div className="report-header">
         <div className="panel-label has-tip" style={{ flex: 1 }}>
-          {list ? `trends_report · ${TREND_LIST[list][0]}` : 'epistemic_state_report'}
+          {sub ? `${sub.section}_report · ${title ?? sub.name}` : 'epistemic_state_report'}
           {report && (
             <span className="report-meta">
               {report.stale && (

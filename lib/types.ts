@@ -258,3 +258,40 @@ export interface TrendsResponse {
   domain: string
   trends: TrendLists | null
 }
+
+// ─── Success (engine D31) ─────────────────────────────────────────────────────
+
+export type SuccessKindName = 'approve' | 'press' | 'museum' | 'market'
+
+/** A sub-report of a domain: one trend list's (D30) or one kind of success's (D31). */
+export type SubReport = { section: 'trends'; name: TrendListName } | { section: 'success'; name: SuccessKindName }
+
+export interface SuccessKind {
+  key: SuccessKindName
+  title: string
+  outcome: string
+  leader: string[]              // empty: own past alone
+  leader_since: number | null
+  gain: number                  // nats over own past
+  mechanisms: [string, number][]
+  effects: Record<string, number>     // "feature=level" -> push on the log-odds of any success
+  dealt: Record<string, number[]>     // engine gain with that feature dealt at random
+  placebo: number
+  placebo_fair: boolean          // false: the year-after features count part of the outcome itself
+  most_raised: [string, number, number][]
+  years: [number, number][]
+}
+
+export interface Rewarded {
+  kind: 'trend' | 'medium'
+  name: string
+  approvals: number
+  disapprovals: number
+  approved: string[]
+  disapproved: string[]
+}
+
+export interface SuccessResponse {
+  domain: string
+  success: { year: number; forecast_for: number; kinds: Record<SuccessKindName, SuccessKind>; rewarded: Rewarded[] } | null
+}

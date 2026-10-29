@@ -46,7 +46,7 @@ export default function TrendLists({ domain }: { domain: Domain }) {
       )}
       {t && reading && (
         <div className="trend-report">
-          <DomainReport key={reading} domain={domain} list={reading} />
+          <DomainReport key={reading} domain={domain} sub={{ section: 'trends', name: reading }} title={TREND_LIST[reading][0]} />
         </div>
       )}
     </div>

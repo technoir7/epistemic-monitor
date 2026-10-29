@@ -65,6 +65,14 @@ const MECHANISM: Record<string, string> = {
   contested: 'contested',
   both_papers: 'in both papers',
   modality: 'predictions or doubts',
+  // Success (engine D31): the artist's coverage that year.
+  new_trend: 'in a new trend',
+  growing_trend: 'in a growing trend',
+  fading_trend: 'in a fading trend',
+  argued_trend: 'in an argued trend',
+  painting: 'painting (Guardian)',
+  photography: 'photography',
+  sculpture: 'sculpture',
 }
 
 /** ['nyt', 'contested'] → "NYT coverage + contested"; [] → "own past alone". */

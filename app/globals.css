@@ -266,9 +266,10 @@ header {
 .main-grid {
   display: grid;
   grid-template-columns: 1fr 1fr 300px;
-  /* Row 4 (shift history) grows with its labels instead of spilling into row 5. */
-  grid-template-rows: 112px 150px 252px minmax(144px, auto) 88px 38px;
-  grid-auto-rows: 88px;
+  /* Rows from 4 on grow with their panels instead of spilling into the next:
+     art's case panels (trends, success, forecasts) land in them. */
+  grid-template-rows: 112px 150px 252px minmax(144px, auto) minmax(88px, auto) minmax(38px, auto);
+  grid-auto-rows: minmax(88px, auto);
   align-items: stretch;
   gap: 8px;
 }
