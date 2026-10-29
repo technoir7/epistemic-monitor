@@ -4,6 +4,7 @@ import { useState } from 'react'
 import useSWR from 'swr'
 import type { Domain, DomainReport as DomainReportType, DomainReportEmpty } from '@/lib/types'
 import { fetchCachedReport, refreshReport } from '@/lib/api'
+import { reportBlocks } from '@/lib/report'
 
 interface Props {
   domain: Domain
@@ -18,18 +19,13 @@ function formatTs(iso: string): string {
 }
 
 function ReportBody({ text }: { text: string }) {
-  const paragraphs = text.split(/\n{2,}/).filter(Boolean)
   return (
     <div className="report-body">
-      {paragraphs.map((para, i) => {
-        if (/^#{1,3}\s/.test(para)) {
-          return (
-            <div key={i} className="report-heading">
-              {para.replace(/^#+\s*/, '')}
-            </div>
-          )
+      {reportBlocks(text).map((block, i) => {
+        if (block.kind === 'heading') {
+          return <div key={i} className="report-heading">{block.text}</div>
         }
-        const parts = para.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/)
+        const parts = block.text.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/)
         return (
           <p key={i} className="report-para">
             {parts.map((part, j) => {
