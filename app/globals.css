@@ -1535,6 +1535,8 @@ header {
 
 .trend-more:hover { color: var(--green); }
 
+.trend-report { margin-top: 14px; border-top: 1px solid var(--green-faint); padding-top: 10px; }
+
 @media (max-width: 1200px) {
   .trends-columns { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }

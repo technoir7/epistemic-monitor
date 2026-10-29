@@ -6,6 +6,7 @@ import type { Domain, Trend, TrendListName, TrendLists as Lists, TrendsResponse 
 import { fetchTrends } from '@/lib/api'
 import { measure, shares } from '@/lib/trends'
 import { TREND_LIST } from '@/lib/labels'
+import DomainReport from '@/components/DomainReport'
 
 const ORDER: TrendListName[] = ['new', 'growing', 'fading', 'argued']
 const ROWS = 12
@@ -15,6 +16,7 @@ const ROWS = 12
 export default function TrendLists({ domain }: { domain: Domain }) {
   const { data, error } = useSWR<TrendsResponse>(['trends', domain], fetchTrends, { revalidateOnFocus: false })
   const t = data?.trends
+  const [reading, setReading] = useState<TrendListName | null>(null)
   return (
     <div className="panel shift-panel">
       <div className="panel-label has-tip">
@@ -36,19 +38,34 @@ export default function TrendLists({ domain }: { domain: Domain }) {
         <div style={{ color: 'var(--text-faint)', fontSize: 10 }}>no trends for this domain</div>
       ) : (
         <div className="trends-columns">
-          {ORDER.map(key => <Column key={key} lists={t} list={key} />)}
+          {ORDER.map(key => (
+            <Column key={key} lists={t} list={key} reading={reading === key}
+              onRead={() => setReading(r => (r === key ? null : key))} />
+          ))}
+        </div>
+      )}
+      {t && reading && (
+        <div className="trend-report">
+          <DomainReport key={reading} domain={domain} list={reading} />
         </div>
       )}
     </div>
   )
 }
 
-function Column({ lists, list }: { lists: Lists; list: TrendListName }) {
+function Column({ lists, list, reading, onRead }: {
+  lists: Lists; list: TrendListName; reading: boolean; onRead: () => void
+}) {
   const [all, setAll] = useState(false)
   const keys = lists.lists[list]
   return (
     <div>
-      <div className="cases-list-title" title={TREND_LIST[list][1]}>{TREND_LIST[list][0]} · {keys.length}</div>
+      <div className="cases-list-title" title={TREND_LIST[list][1]}>
+        {TREND_LIST[list][0]} · {keys.length}{' '}
+        <button className="trend-more" onClick={onRead} aria-pressed={reading}>
+          {reading ? '[ close report ]' : '[ read report ]'}
+        </button>
+      </div>
       {(all ? keys : keys.slice(0, ROWS)).map(k => <Row key={k} lists={lists} list={list} trend={lists.trends[k]} />)}
       {keys.length > ROWS && (
         <button className="trend-more" onClick={() => setAll(a => !a)}>

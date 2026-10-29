@@ -11,6 +11,7 @@ import type {
   DomainReportEmpty,
   CasesResponse,
   TrendsResponse,
+  TrendListName,
 } from './types'
 
 const API_BASE =
@@ -107,13 +108,18 @@ export async function fetchTrends(
 
 // ─── Reports ─────────────────────────────────────────────────────────────────
 
-export async function fetchCachedReport(
-  [, domain]: [string, Domain],
-): Promise<DomainReport | DomainReportEmpty> {
-  // The engine answers {found: false} when nothing is cached yet.
-  return get(`/v1/report/${q(domain)}`)
+// A domain's report, or with LIST one of its trend lists' reports (engine D30).
+function reportPath(domain: Domain, list?: TrendListName): string {
+  return list ? `/v1/trends/${q(domain)}/${q(list)}/report` : `/v1/report/${q(domain)}`
 }
 
-export async function refreshReport(domain: Domain): Promise<DomainReport> {
-  return post(`/v1/report/${q(domain)}/refresh`)
+export async function fetchCachedReport(
+  [, domain, list]: [string, Domain, TrendListName?],
+): Promise<DomainReport | DomainReportEmpty> {
+  // The engine answers {found: false} when nothing is cached yet.
+  return get(reportPath(domain, list))
+}
+
+export async function refreshReport(domain: Domain, list?: TrendListName): Promise<DomainReport> {
+  return post(`${reportPath(domain, list)}/refresh`)
 }
