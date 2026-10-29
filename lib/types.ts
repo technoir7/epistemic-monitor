@@ -229,3 +229,32 @@ export interface CasesResponse {
   domain: string
   case_sets: CaseSet[]
 }
+
+// ─── Trends (engine D30) ──────────────────────────────────────────────────────
+
+export interface Trend {
+  key: string
+  name: string
+  start: number           // first year broad
+  words: string[]
+  writers: number[]       // each year of TrendLists.years
+  papers: string[]        // this year
+  verdicts: number[]      // approvals, disapprovals this year
+  sample: string[]        // a few of this year's claims, as the reader put them
+}
+
+export type TrendListName = 'new' | 'growing' | 'fading' | 'argued'
+
+export interface TrendLists {
+  year: number            // years end in September
+  before: number          // years this one is set against
+  years: number[]
+  all_writers: number[]
+  lists: Record<TrendListName, string[]>
+  trends: Record<string, Trend>
+}
+
+export interface TrendsResponse {
+  domain: string
+  trends: TrendLists | null
+}

@@ -10,6 +10,7 @@ import type {
   DomainReport,
   DomainReportEmpty,
   CasesResponse,
+  TrendsResponse,
 } from './types'
 
 const API_BASE =
@@ -96,6 +97,12 @@ export async function fetchCases(
   [, domain]: [string, Domain],
 ): Promise<CasesResponse> {
   return get(`/v1/cases?domain=${q(domain)}`)
+}
+
+export async function fetchTrends(
+  [, domain]: [string, Domain],
+): Promise<TrendsResponse> {
+  return get(`/v1/trends?domain=${q(domain)}`)
 }
 
 // ─── Reports ─────────────────────────────────────────────────────────────────

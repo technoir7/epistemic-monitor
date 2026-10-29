@@ -80,3 +80,11 @@ export function anyChance(p: number[]): string {
   if (any < 0.005) return '<1%'
   return `${Math.round(any * 100)}%`
 }
+
+/** The art trend lists (engine D30): title, and the rule that fills each. */
+export const TREND_LIST: Record<'new' | 'growing' | 'fading' | 'argued', [string, string]> = {
+  new: ['new', 'broad for the first time since 2021, by writers this year'],
+  growing: ['growing', 'share of critics at least 1.5× its average over the three years before'],
+  fading: ['fading', 'share of critics at most half its best of the three years before'],
+  argued: ['argued_over', 'at least 10 verdicts; ranked by how evenly critics split between approval and disapproval'],
+}

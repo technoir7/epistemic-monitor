@@ -1485,6 +1485,61 @@ header {
   text-overflow: ellipsis;
 }
 
+/* ── Trends (art; engine D30) ── */
+.trends-columns {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.trend-head {
+  display: grid;
+  grid-template-columns: 1fr 44px 64px;
+  gap: 6px;
+  align-items: center;
+  width: 100%;
+  padding: 1px 0;
+  background: none;
+  border: none;
+  font: inherit;
+  font-size: 10px;
+  color: var(--text-dim);
+  text-align: left;
+  cursor: pointer;
+}
+
+.trend-head:hover .cases-name { color: var(--green); }
+
+.trend-measure { text-align: right; color: var(--green-dim); }
+
+.trend-detail {
+  font-size: 9px;
+  color: var(--text-dim);
+  margin: 2px 0 6px 8px;
+  border-left: 1px solid var(--green-faint);
+  padding-left: 6px;
+  overflow-wrap: anywhere;
+}
+
+.trend-claim { margin-top: 3px; color: var(--text-faint); }
+
+.trend-more {
+  background: none;
+  border: none;
+  padding: 2px 0;
+  font: inherit;
+  font-size: 9px;
+  color: var(--text-faint);
+  cursor: pointer;
+}
+
+.trend-more:hover { color: var(--green); }
+
+@media (max-width: 1200px) {
+  .trends-columns { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
 @media (max-width: 900px) {
   .cases-columns { grid-template-columns: 1fr; }
+  .trends-columns { grid-template-columns: 1fr; }
 }
