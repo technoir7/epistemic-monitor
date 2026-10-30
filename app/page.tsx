@@ -13,6 +13,7 @@ import CaseForecasts       from '@/components/CaseForecasts'
 import CaseShifts          from '@/components/CaseShifts'
 import TrendLists          from '@/components/TrendLists'
 import SuccessPanel        from '@/components/SuccessPanel'
+import MoversPanel         from '@/components/MoversPanel'
 import OntologyPopulation  from '@/components/OntologyPopulation'
 import EdgeExistencePanel  from '@/components/EdgeExistencePanel'
 import EvidenceStream      from '@/components/EvidenceStream'
@@ -263,6 +264,7 @@ function CasePanels({ domain }: { domain: Exclude<Domain, 'ng'> }) {
       <CaseRivals domain={domain} />
       <TrendLists domain={domain} />
       <SuccessPanel domain={domain} />
+      <MoversPanel domain={domain} />
       <CaseForecasts domain={domain} />
       <CaseShifts domain={domain} />
       <PromptLine domain={domain} />

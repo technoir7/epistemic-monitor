@@ -261,7 +261,9 @@ export interface TrendsResponse {
 
 // ─── Success (engine D31) ─────────────────────────────────────────────────────
 
-export type SuccessKindName = 'approve' | 'press' | 'museum' | 'market'
+export type MainKindName = 'approve' | 'press' | 'museum' | 'market'
+/** The four kinds of success, and market movers, which has its own panel (ART-PLAN §13). */
+export type SuccessKindName = MainKindName | 'movers'
 
 /** A sub-report of a domain: one trend list's (D30) or one kind of success's (D31). */
 export type SubReport = { section: 'trends'; name: TrendListName } | { section: 'success'; name: SuccessKindName }
@@ -293,5 +295,10 @@ export interface Rewarded {
 
 export interface SuccessResponse {
   domain: string
-  success: { year: number; forecast_for: number; kinds: Record<SuccessKindName, SuccessKind>; rewarded: Rewarded[] } | null
+  success: {
+    year: number
+    forecast_for: number
+    kinds: Record<MainKindName, SuccessKind> & { movers?: SuccessKind }
+    rewarded: Rewarded[]
+  } | null
 }

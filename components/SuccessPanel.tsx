@@ -2,13 +2,13 @@
 
 import { useState } from 'react'
 import useSWR from 'swr'
-import type { Domain, Rewarded, SuccessKind, SuccessKindName, SuccessResponse } from '@/lib/types'
+import type { Domain, MainKindName, Rewarded, SuccessKind, SuccessResponse } from '@/lib/types'
 import { fetchSuccess } from '@/lib/api'
 import { mechanismLabel } from '@/lib/labels'
 import { adds, pushes, rewardedBy } from '@/lib/success'
 import DomainReport from '@/components/DomainReport'
 
-const ORDER: SuccessKindName[] = ['approve', 'press', 'museum', 'market']
+const ORDER: MainKindName[] = ['approve', 'press', 'museum', 'market']
 const PUSHES = 5
 const REWARDED = 8
 
@@ -16,7 +16,7 @@ const REWARDED = 8
 // what critics rewarded this year. Judged offline over every artist-year.
 export default function SuccessPanel({ domain }: { domain: Domain }) {
   const { data, error } = useSWR<SuccessResponse>(['success', domain], fetchSuccess, { revalidateOnFocus: false })
-  const [reading, setReading] = useState<SuccessKindName | null>(null)
+  const [reading, setReading] = useState<MainKindName | null>(null)
   const s = data?.success
   return (
     <div className="panel shift-panel">
@@ -62,7 +62,7 @@ export default function SuccessPanel({ domain }: { domain: Domain }) {
   )
 }
 
-function Kind({ kind, reading, onRead }: { kind: SuccessKind; reading: boolean; onRead: () => void }) {
+export function Kind({ kind, reading, onRead }: { kind: SuccessKind; reading: boolean; onRead: () => void }) {
   return (
     <div>
       <div className="cases-list-title" title={kind.outcome}>
