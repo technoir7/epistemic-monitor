@@ -73,6 +73,9 @@ const MECHANISM: Record<string, string> = {
   painting: 'painting (Guardian)',
   photography: 'photography',
   sculpture: 'sculpture',
+  // Which themes help (engine ART-PLAN §14).
+  good_theme: 'in a good-record theme',
+  poor_theme: 'in a poor-record theme',
 }
 
 /** ['nyt', 'contested'] → "NYT coverage + contested"; [] → "own past alone". */

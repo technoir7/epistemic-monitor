@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { adds, pushes, rewardedBy } from './success.ts'
+import { adds, pushes, rewardedBy, themeRecord } from './success.ts'
 import type { Rewarded } from './types'
 
 test("the leader's features are listed by how hard they push, each with its direction", () => {
@@ -21,4 +21,13 @@ test('what critics rewarded is split by kind and ranked by the share of verdicts
 test("what each leading feature adds is the gain lost when it is dealt at random, averaged over the deals, biggest first", () => {
   const rows = adds({ gain: 100, dealt: { nyt: [40, 50, 60], painting: [101, 99, 100] } })
   assert.deepEqual(rows.map(r => [r.label, r.adds]), [['NYT coverage', 50], ['painting (Guardian)', 0]])
+})
+
+test("a theme's record leads when either record feature is in the leader, and is measured against the kind's own leader", () => {
+  const t = { leader: ['photography', 'nyt', 'good_theme'], gain: 243.5, gain_without: 227.0, dealt: { good_theme: [227, 230.3, 227], poor_theme: [243.5] } }
+  const v = themeRecord(t)
+  assert.equal(v.leads, true)
+  assert.equal(Math.round(v.over * 10) / 10, 16.5)
+  assert.equal(Math.round(v.adds * 10) / 10, 15.4)        // gain less the mean with good_theme dealt
+  assert.equal(themeRecord({ ...t, leader: ['nyt'], gain: 58.1, gain_without: 58.1 }).leads, false)
 })

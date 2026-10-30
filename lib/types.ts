@@ -266,7 +266,7 @@ export type MainKindName = 'approve' | 'press' | 'museum' | 'market'
 export type SuccessKindName = MainKindName | 'movers'
 
 /** A sub-report of a domain: one trend list's (D30) or one kind of success's (D31). */
-export type SubReport = { section: 'trends'; name: TrendListName } | { section: 'success'; name: SuccessKindName }
+export type SubReport = { section: 'trends'; name: TrendListName } | { section: 'success'; name: SuccessKindName | 'themes' }
 
 export interface SuccessKind {
   key: SuccessKindName
@@ -293,6 +293,20 @@ export interface Rewarded {
   disapproved: string[]
 }
 
+/** A theme's track record tested on top of one kind's leader (engine ART-PLAN §14). */
+export interface ThemeTest {
+  leader: string[]
+  leader_since: number | null
+  gain: number
+  gain_without: number          // the kind's own leader, without the records
+  effects: Record<string, number>
+  dealt: Record<string, number[]>
+  placebo: number
+  year: number
+  best: [string, number][]      // named theme, record
+  worst: [string, number][]
+}
+
 export interface SuccessResponse {
   domain: string
   success: {
@@ -300,5 +314,6 @@ export interface SuccessResponse {
     forecast_for: number
     kinds: Record<MainKindName, SuccessKind> & { movers?: SuccessKind }
     rewarded: Rewarded[]
+    themes: Record<MainKindName, ThemeTest>
   } | null
 }
