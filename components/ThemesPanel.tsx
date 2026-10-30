@@ -58,6 +58,9 @@ export default function ThemesPanel({ domain }: { domain: Domain }) {
 
 function Column({ title, test }: { title: string; test: ThemeTest }) {
   const v = themeRecord(test)
+  // Where the record adds nothing its themes describe the past only, so they are not coloured as advice.
+  const good = v.leads ? 'var(--green-dim)' : 'var(--text-faint)'
+  const poor = v.leads ? 'var(--red-dim)' : 'var(--text-faint)'
   return (
     <div>
       <div className="cases-list-title">{title}</div>
@@ -67,11 +70,11 @@ function Column({ title, test }: { title: string; test: ThemeTest }) {
       </div>
       <div className="cases-row" style={{ color: 'var(--text-faint)' }}><span className="cases-name">best records</span></div>
       {test.best.slice(0, SHOWN).map(([name]) => (
-        <div key={name} className="cases-row"><span className="cases-name" style={{ color: 'var(--green-dim)' }}>{name}</span></div>
+        <div key={name} className="cases-row"><span className="cases-name" style={{ color: good }}>{name}</span></div>
       ))}
       <div className="cases-row" style={{ color: 'var(--text-faint)' }}><span className="cases-name">worst records</span></div>
       {test.worst.slice(0, SHOWN).map(([name]) => (
-        <div key={name} className="cases-row"><span className="cases-name" style={{ color: 'var(--red-dim)' }}>{name}</span></div>
+        <div key={name} className="cases-row"><span className="cases-name" style={{ color: poor }}>{name}</span></div>
       ))}
     </div>
   )
