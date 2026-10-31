@@ -313,6 +313,7 @@ export interface LifeTest extends ThemeTest {
   told_year: number | null      // the year whose championed artists the told lists describe (ART-PLAN 15.12)
   told_most: [string, number][] // blocks told most about them beyond their share, score
   told_least: [string, number][]
+  edges?: [string, string, number, number][]   // the imagined life's graph: source, target, share, times the usual (15.16)
 }
 
 export interface SuccessResponse {

@@ -49,6 +49,19 @@ export default function LivesPanel({ domain }: { domain: Domain }) {
   )
 }
 
+const PAIRS = 3
+
+// The imagined life's graph (engine ART-PLAN 15.16): one line a pair, the strongest first, since
+// "times the usual" is the same both ways.
+function pairs(test: LifeTest): [string, string, number][] {
+  const seen = new Set<string>()
+  return (test.edges ?? [])
+    .filter(([a, b]) => { const k = [a, b].sort().join('|'); if (seen.has(k)) return false; seen.add(k); return true })
+    .map(([a, b, , times]): [string, string, number] => [a, b, times])
+    .sort((x, y) => y[2] - x[2])
+    .slice(0, PAIRS)
+}
+
 function Column({ title, test }: { title: string; test: LifeTest }) {
   return (
     <div>
@@ -59,6 +72,14 @@ function Column({ title, test }: { title: string; test: LifeTest }) {
       <div className="cases-row" style={{ color: 'var(--text-faint)' }}><span className="cases-name">told most</span></div>
       {test.told_most.slice(0, SHOWN).map(([name]) => (
         <div key={name} className="cases-row"><span className="cases-name">{name}</span></div>
+      ))}
+      {pairs(test).length > 0 && (
+        <div className="cases-row" style={{ color: 'var(--text-faint)' }}><span className="cases-name">its life&apos;s stories go together</span></div>
+      )}
+      {pairs(test).map(([a, b, times]) => (
+        <div key={`${a}+${b}`} className="cases-row" title={`${a} and ${b}: told together about the same artist ${times} times the usual`}>
+          <span className="cases-name">{a} + {b}</span><span style={{ color: 'var(--text-faint)' }}>×{times}</span>
+        </div>
       ))}
       <div className="cases-row" style={{ color: 'var(--text-faint)' }}><span className="cases-name">told least</span></div>
       {test.told_least.slice(0, SHOWN).map(([name]) => (
