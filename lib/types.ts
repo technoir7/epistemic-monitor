@@ -310,6 +310,9 @@ export interface ThemeTest {
 /** Life blocks' records tested on top of one kind's leader (engine ART-PLAN 15.7), with the engine's verdict. */
 export interface LifeTest extends ThemeTest {
   verdict: 'untested' | 'nothing' | 'with' | 'predicts'
+  told_year: number | null      // the year whose championed artists the told lists describe (ART-PLAN 15.12)
+  told_most: [string, number][] // blocks told most about them beyond their share, score
+  told_least: [string, number][]
 }
 
 export interface SuccessResponse {

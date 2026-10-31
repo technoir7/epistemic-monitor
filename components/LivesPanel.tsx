@@ -8,30 +8,30 @@ const ORDER: SuccessKindName[] = ['approve', 'press', 'museum', 'market', 'mover
 const SHOWN = 6
 
 const VERDICT: Record<LifeTest['verdict'], string> = {
-  untested: 'not tested',
-  nothing: 'life adds nothing',
-  with: 'comes with success, not before',
-  predicts: 'life predicts',
+  untested: 'forecast: not tested',
+  nothing: 'forecast: life adds nothing',
+  with: 'forecast: comes with success',
+  predicts: 'forecast: life predicts',
 }
 
-// Which life stories go with each kind of success (abductive_engine ART-PLAN
-// 15.7, 15.4 as built). The verdict is the engine's, not judged here: a life
-// feature can lead and still add nothing.
+// Which life stories are told about the artists who had each kind of success
+// (abductive_engine ART-PLAN 15.12, 15.4 revised): description, not a cause,
+// so nothing is coloured as help or harm. The forecast verdict is the engine's.
 export default function LivesPanel({ domain }: { domain: Domain }) {
   const { data, error } = useSWR<SuccessResponse>(['success', domain], fetchSuccess, { revalidateOnFocus: false })
   const s = data?.success
   const lives = s?.lives ?? {}
   const kinds = ORDER.filter(k => lives[k] && s?.kinds[k as keyof typeof s.kinds])
-  const year = kinds.length ? lives[kinds[0]]?.year : undefined
+  const year = kinds.length ? lives[kinds[0]]?.told_year : undefined
   return (
     <div className="panel shift-panel">
       <div className="panel-label has-tip">
-        lives · which_help{year ? ` · records for ${year}` : ''}
+        lives · told_of_the_championed{year ? ` · ${year}` : ''}
         <div className="tip" style={{ left: 0, transform: 'none' }}>
           A life block is a theme critics write in, counting only claims about an artist&apos;s life (a model read every
-          claim as about a life or about the work). Each block gets a track record for each kind of success, from earlier
-          years only. Claims in good-record and poor-record blocks are then tested on top of what already predicts that
-          kind. Where they add nothing, the best and worst blocks describe the past only, and are not coloured.
+          claim as about a life or about the work). For each kind of success, the blocks told most and least about the
+          artists who had it that year, against their share of all life talk that year. This describes what was said
+          about the championed; it is not a cause. The first line says whether life stories help forecast the kind at all.
         </div>
       </div>
       {error ? (
@@ -50,22 +50,19 @@ export default function LivesPanel({ domain }: { domain: Domain }) {
 }
 
 function Column({ title, test }: { title: string; test: LifeTest }) {
-  const predicts = test.verdict === 'predicts'
-  const good = predicts ? 'var(--green-dim)' : 'var(--text-faint)'
-  const poor = predicts ? 'var(--red-dim)' : 'var(--text-faint)'
   return (
     <div>
       <div className="cases-list-title">{title}</div>
-      <div className="cases-row" style={{ color: predicts ? 'var(--green)' : 'var(--text-faint)' }}>
+      <div className="cases-row" style={{ color: 'var(--text-faint)' }}>
         <span className="cases-name">{VERDICT[test.verdict]}</span>
       </div>
-      <div className="cases-row" style={{ color: 'var(--text-faint)' }}><span className="cases-name">best records</span></div>
-      {test.best.slice(0, SHOWN).map(([name]) => (
-        <div key={name} className="cases-row"><span className="cases-name" style={{ color: good }}>{name}</span></div>
+      <div className="cases-row" style={{ color: 'var(--text-faint)' }}><span className="cases-name">told most</span></div>
+      {test.told_most.slice(0, SHOWN).map(([name]) => (
+        <div key={name} className="cases-row"><span className="cases-name">{name}</span></div>
       ))}
-      <div className="cases-row" style={{ color: 'var(--text-faint)' }}><span className="cases-name">worst records</span></div>
-      {test.worst.slice(0, SHOWN).map(([name]) => (
-        <div key={name} className="cases-row"><span className="cases-name" style={{ color: poor }}>{name}</span></div>
+      <div className="cases-row" style={{ color: 'var(--text-faint)' }}><span className="cases-name">told least</span></div>
+      {test.told_least.slice(0, SHOWN).map(([name]) => (
+        <div key={name} className="cases-row"><span className="cases-name" style={{ color: 'var(--text-faint)' }}>{name}</span></div>
       ))}
     </div>
   )
