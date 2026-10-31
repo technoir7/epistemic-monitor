@@ -307,6 +307,11 @@ export interface ThemeTest {
   worst: [string, number][]
 }
 
+/** Life blocks' records tested on top of one kind's leader (engine ART-PLAN 15.7), with the engine's verdict. */
+export interface LifeTest extends ThemeTest {
+  verdict: 'untested' | 'nothing' | 'with' | 'predicts'
+}
+
 export interface SuccessResponse {
   domain: string
   success: {
@@ -315,5 +320,6 @@ export interface SuccessResponse {
     kinds: Record<MainKindName, SuccessKind> & { movers?: SuccessKind }
     rewarded: Rewarded[]
     themes: Record<MainKindName, ThemeTest>
+    lives?: Partial<Record<SuccessKindName, LifeTest>>
   } | null
 }
