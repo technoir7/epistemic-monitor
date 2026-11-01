@@ -58,7 +58,7 @@ Rules:
   one plain sentence: what A is, why it leads to B, why B leads to C
 - Each signal in current_regime_state has a level (low, mid or high: how
   far its measure lies from the line its name describes) and a degree from
-  0 to 1; art's signals are yes/no, and their degree is the chance of yes
+  0 (surely low) to 1 (surely high)
 - Ground abstract variables in concrete real-world terms:
 {{VARIABLE_DEFINITIONS}}
 - Be direct about what this means for business conditions
