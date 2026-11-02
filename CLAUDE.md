@@ -1,3 +1,7 @@
+## Context
+The project map is `../probabilistic_ontology_engine/SNAPSHOT.md` (also on
+GitHub in that repo): what the engine is, how it works, what is open.
+
 ## Design
 Design tokens are the `:root` custom properties in app/globals.css.
 Font stack: VT323 (headers/large numbers), Share Tech Mono (body/data).
