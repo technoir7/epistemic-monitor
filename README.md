@@ -1,5 +1,7 @@
 # Epistemic State Monitor
 
+[![CI](https://github.com/technoir7/epistemic-monitor/actions/workflows/ci.yml/badge.svg)](https://github.com/technoir7/epistemic-monitor/actions/workflows/ci.yml)
+
 A live dashboard for the
 [Probabilistic Ontology Engine](https://github.com/technoir7/probabilistic_ontology_engine),
 a system that keeps several rival explanations of a domain (the macro economy,
