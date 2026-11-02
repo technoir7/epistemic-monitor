@@ -44,6 +44,8 @@ evidence feed.
 
 ### Art
 
+![The art tab: case mechanisms, rival explanations, graded signals and this year's trend lists](docs/art.png)
+
 Art's monthly totals (each paper's share of art articles by topic, market
 figures, museum buys) form no links, so the art tab shows the engine's *case
 mode* instead: every artist, concept and trend is a case, and a mechanism
